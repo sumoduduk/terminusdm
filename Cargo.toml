@@ -16,6 +16,4 @@ dirs = "5.0.1"
 eyre = "0.6.12"
 reqwest = "0.11.25"
 tokio = { version = "1.36.0", features = ["full"] }
-trauma = "2.2.4"
-
-# trauma ={ git = 'https://github.com/sumoduduk/trauma.git', rev = '3d657f85fe5c9b17ec6b81a27061e62050672436'}
+trauma ={ git = 'https://github.com/sumoduduk/trauma.git', rev = '267a1d886d5aa809eda02e1bdb425039285d55db'}
