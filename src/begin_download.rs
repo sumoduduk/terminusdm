@@ -13,7 +13,7 @@ pub async fn start_download(uri: &str, range_header: &[String]) -> eyre::Result<
 
     let temp = download_dirs.join("temp");
 
-    std::fs::create_dir_all(&temp)?;
+    tokio::fs::create_dir_all(&temp).await?;
 
     let filename = temp
         .as_os_str()
