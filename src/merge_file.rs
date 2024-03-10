@@ -3,7 +3,13 @@ use std::path::Path;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
 
-pub async fn merge(out_folder: &Path, divisor: usize, output_name: &str) -> eyre::Result<()> {
+pub async fn merge(
+    out_folder: &Path,
+    divisor: usize,
+    parent: &Path,
+    output_name: &str,
+) -> eyre::Result<()> {
+    println!("INFO: Start Merging");
     let mut dir_entry = fs::read_dir(out_folder).await?;
 
     let mut file_paths = Vec::with_capacity(divisor);
@@ -19,9 +25,23 @@ pub async fn merge(out_folder: &Path, divisor: usize, output_name: &str) -> eyre
         }
     }
 
-    file_paths.sort();
+    file_paths.sort_by_key(|p| {
+        let str_path = p.file_name().and_then(|os_str| os_str.to_str());
 
-    let output_name = out_folder.join(output_name);
+        let mut num = 0;
+
+        match str_path {
+            Some(file_str) => match file_str.parse::<u32>() {
+                Ok(num_res) => num = num_res,
+                Err(err) => println!("ERROR: {err}"),
+            },
+            None => println!("ERROR: failed to conver os str to str"),
+        }
+
+        num
+    });
+
+    let output_name = parent.join(output_name);
 
     let mut file_output = fs::OpenOptions::new()
         .append(true)
@@ -29,17 +49,16 @@ pub async fn merge(out_folder: &Path, divisor: usize, output_name: &str) -> eyre
         .open(output_name)
         .await?;
 
-    // let mut writer = BufWriter::new(&mut file_output);
     for p in file_paths.iter() {
         let buff = fs::read(p).await?;
         file_output.write_all(&buff).await?;
-
-        // writer.write(&buff).await?;
-
-        println!("done write");
     }
 
-    // writer.flush().await?;
+    let res = fs::remove_dir_all(out_folder).await;
+    if res.is_err() {
+        println!("{:#?}", res);
+    }
+    println!("INFO: Done Merging");
 
     Ok(())
 }
@@ -50,10 +69,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_merge() {
-        let path_str = "test/Downloads/temp/";
+        let path_str = "test/downloads/temp/";
         let path = Path::new(path_str);
 
-        let res = merge(path, 8, "output.zip").await;
+        let res = merge(path, 8, path, "output.zip").await;
+        dbg!(&res);
+
+        assert!(res.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_bin_merge() {
+        let path_str = "/home/calista/Downloads/tdm/temp/pytorch_model.bin/";
+        let path = Path::new(path_str);
+
+        let res = merge(path, 16, path, "output.bin").await;
         dbg!(&res);
 
         assert!(res.is_ok());
