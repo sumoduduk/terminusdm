@@ -5,6 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+
+[lints.rust]
+unsafe_code = "forbid"
+# unused = "allow" # For exploratory dev.
+needless_return = "allow"
+
 [dependencies]
 dirs = "5.0.1"
 eyre = "0.6.12"
