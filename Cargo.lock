@@ -1367,6 +1367,7 @@ version = "0.1.0"
 dependencies = [
  "dirs",
  "eyre",
+ "form_urlencoded",
  "reqwest",
  "tokio",
  "trauma",

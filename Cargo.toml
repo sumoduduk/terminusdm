@@ -9,11 +9,11 @@ edition = "2021"
 [lints.rust]
 unsafe_code = "forbid"
 # unused = "allow" # For exploratory dev.
-needless_return = "allow"
 
 [dependencies]
 dirs = "5.0.1"
 eyre = "0.6.12"
 reqwest = "0.11.25"
 tokio = { version = "1.36.0", features = ["full"] }
+form_urlencoded = "1.2.1"
 trauma ={ git = 'https://github.com/sumoduduk/trauma.git', rev = '267a1d886d5aa809eda02e1bdb425039285d55db'}
