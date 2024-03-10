@@ -3,25 +3,24 @@ use std::path::PathBuf;
 use trauma::download::{Download, Summary};
 use trauma::downloader::DownloaderBuilder;
 
-use eyre::OptionExt;
-
 pub async fn start_download(
     temp: PathBuf,
-    uri: &str,
+    uri: &Url,
     range_header: &[(u64, u64)],
 ) -> eyre::Result<Vec<Summary>> {
     tokio::fs::create_dir_all(&temp).await?;
 
-    let url = Url::parse(uri)?;
-
     let mut batch_dl = Vec::with_capacity(range_header.len());
 
     for (i, range) in range_header.iter().enumerate() {
-        let dl = Download::new(&url, &i.to_string(), Some(*range));
+        let dl = Download::new(uri, &i.to_string(), Some(*range));
         batch_dl.push(dl);
     }
 
-    let begin = DownloaderBuilder::new().directory(temp).build();
+    let begin = DownloaderBuilder::new()
+        .directory(temp)
+        .concurrent_downloads(4)
+        .build();
 
     let summary = begin.download(&batch_dl).await;
 
@@ -36,6 +35,16 @@ mod tests {
 
     const URI : &str = "https://huggingface.co/datasets/ym0v0my/Time_series_dataset/resolve/main/all_six_datasets.zip?download=true";
 
+    #[test]
+    fn test_dirs() {
+        if let Some(dir) = dirs::home_dir() {
+            let down = dir.join("Downloads");
+            dbg!(down);
+        };
+
+        assert_eq!(true, true);
+    }
+
     #[tokio::test]
     async fn test_concurent_donwload() -> eyre::Result<()> {
         let download_dirs = dirs::download_dir()
@@ -48,6 +57,7 @@ mod tests {
         if !header_obj.is_ranges()? {
             return Err(eyre!("Not Resumable"));
         }
+        let uri = header_obj.get_url();
 
         let sizes = header_obj.get_sizes()?;
         dbg!(sizes);
@@ -57,10 +67,10 @@ mod tests {
             create_range(sizes, divisor).ok_or_eyre("Error: divisor should be non-zero")?;
         let out_file = "output.zip";
 
-        let summary = start_download(temp.clone(), &URI, &ranges).await;
+        let summary = start_download(temp.clone(), uri, &ranges).await;
         assert!(summary.is_ok());
 
-        let res = merge(&temp, divisor as usize, out_file).await;
+        let res = merge(&temp, divisor as usize, &temp, out_file).await;
 
         dbg!(&res);
         assert!(res.is_ok());
