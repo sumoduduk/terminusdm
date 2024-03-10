@@ -16,9 +16,9 @@ impl HeaderObject {
         })
     }
 
-    pub fn get_sizes(&self) -> eyre::Result<u32> {
+    pub fn get_sizes(&self) -> eyre::Result<u64> {
         let sizes = self.header.get(CONTENT_LENGTH).ok_or_eyre("Size Unknown")?;
-        let size_num = sizes.to_str()?.parse::<u32>()?;
+        let size_num = sizes.to_str()?.parse::<u64>()?;
         Ok(size_num)
     }
 
