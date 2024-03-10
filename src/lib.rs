@@ -1,5 +1,6 @@
 mod begin_download;
 mod file_fn;
+mod merge_file;
 mod req_lib;
 mod utils;
 
