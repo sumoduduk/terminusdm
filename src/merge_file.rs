@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use tokio::fs;
-use tokio::io::{AsyncWriteExt, BufWriter};
+use tokio::io::AsyncWriteExt;
 
 pub async fn merge(out_folder: &Path, divisor: usize, output_name: &str) -> eyre::Result<()> {
     let mut dir_entry = fs::read_dir(out_folder).await?;
@@ -10,12 +10,6 @@ pub async fn merge(out_folder: &Path, divisor: usize, output_name: &str) -> eyre
 
     while let Some(file_chunk) = dir_entry.next_entry().await? {
         let path_file = file_chunk.path();
-
-        // let file_name = path_file
-        //     .file_name()
-        //     .ok_or_eyre("failed to str")?
-        //     .to_str()
-        //     .ok_or_eyre("failed os str")?;
 
         if path_file.is_file() {
             let ext = path_file.extension();
