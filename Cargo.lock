@@ -1610,6 +1610,8 @@ dependencies = [
  "form_urlencoded",
  "ratatui",
  "reqwest",
+ "serde",
+ "serde_json",
  "tokio",
  "trauma",
 ]
