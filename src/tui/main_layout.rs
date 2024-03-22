@@ -19,6 +19,7 @@ use self::{
 pub fn ui(frame: &mut Frame, app: &AppTui) {
     let chunk = Layout::default()
         .direction(Direction::Vertical)
+        .margin(3)
         .constraints([
             Constraint::Length(3),
             Constraint::Min(1),
@@ -49,11 +50,12 @@ pub fn ui(frame: &mut Frame, app: &AppTui) {
 
     let popup_component = popup_editing_layout();
 
+    let input_comp = popup_component.inner(area_popup);
     frame.render_widget(popup_component, area_popup);
 
     let input_par = input_editing(app);
 
-    frame.render_widget(input_par, area_popup);
+    frame.render_widget(input_par, input_comp);
 
     if let CurrentScreen::Exiting = app.curr_screen {
         frame.render_widget(Clear, frame.size());
@@ -66,7 +68,6 @@ pub fn ui(frame: &mut Frame, app: &AppTui) {
 }
 
 fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
-    // Cut the given rectangle into three vertical pieces
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
