@@ -1,12 +1,46 @@
 mod begin_download;
 mod merge_file;
 mod req_lib;
+pub mod tui;
 mod utils;
 
 use eyre::{eyre, OptionExt};
 use req_lib::HeaderObject;
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
+
+enum CurrentScreen {
+    Main,
+    Editing,
+    Exiting,
+}
+
+pub struct AppTui {
+    input_uri: String,
+    curr_screen: CurrentScreen,
+    saved_input: Vec<String>,
+}
+
+impl AppTui {
+    pub fn new() -> Self {
+        Self {
+            input_uri: String::new(),
+            curr_screen: CurrentScreen::Main,
+            saved_input: Vec::new(),
+        }
+    }
+
+    fn save_input(&mut self) {
+        self.saved_input.push(self.input_uri.clone());
+        self.input_uri = String::new()
+    }
+
+    pub fn print_vec(&self) -> eyre::Result<()> {
+        let output = serde_json::to_string_pretty(&self.saved_input)?;
+        println!("{}", output);
+        Ok(())
+    }
+}
 
 pub async fn download_chunk(download_uri: &str) -> eyre::Result<()> {
     let header_obj = HeaderObject::new(download_uri).await?;
