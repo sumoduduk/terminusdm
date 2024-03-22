@@ -1,5 +1,5 @@
 use ratatui::{
-    style::{Color, Style, Stylize},
+    style::{Color, Style},
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
@@ -7,6 +7,11 @@ use ratatui::{
 use crate::AppTui;
 
 pub fn body_comp(app: &AppTui) -> List<'static> {
+    let block_body = Block::default()
+        .title("Download History")
+        .borders(Borders::ALL)
+        .border_style(Style::default());
+
     let mut list_item: Vec<ListItem> = Vec::new();
 
     for name_input in &app.saved_input {
@@ -16,30 +21,28 @@ pub fn body_comp(app: &AppTui) -> List<'static> {
         ))))
     }
 
-    let list = List::new(list_item);
+    let list = List::new(list_item).block(block_body);
 
     list
 }
 
-pub fn popup_editing_layout() -> Block<'static> {
-    let popup_component = Block::default()
-        .title("Enter a URI")
-        .borders(Borders::NONE)
-        .style(Style::default().fg(Color::White).bg(Color::Blue));
-
-    popup_component
-}
-
 pub fn input_editing(app: &AppTui) -> Paragraph<'static> {
     let input_components = Block::default()
+        .title("Enter a URI")
         .borders(Borders::ALL)
-        .style(Style::default().bg(Color::LightBlue).fg(Color::Black));
+        .border_style(Style::default());
 
     let input_par = Paragraph::new(app.input_uri.clone())
         .block(input_components)
         .wrap(Wrap { trim: false });
 
     input_par
+}
+
+pub fn download_process() -> Block<'static> {
+    Block::default()
+        .title("Download Process")
+        .borders(Borders::ALL)
 }
 
 pub fn popup_exit() -> Paragraph<'static> {
@@ -52,7 +55,6 @@ pub fn popup_exit() -> Paragraph<'static> {
         "Would you like to output the buffer as json? (y/n)",
         Style::default().fg(Color::Red),
     );
-    // the `trim: false` will stop the text from being cut off when over the edge of the block
     let exit_paragraph = Paragraph::new(exit_text)
         .block(popup_exit_component)
         .wrap(Wrap { trim: false });
