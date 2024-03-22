@@ -1,21 +1,22 @@
 use ratatui::{
     style::{Color, Style},
-    text::Text,
-    widgets::{Block, Borders, Paragraph},
+    symbols,
+    text::{Line, Span},
 };
 
-pub fn header_comp() -> Paragraph<'static> {
-    let title_block = Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default());
+pub fn header_comp() -> Line<'static> {
+    let title_span = vec![
+        Span::styled(
+            format!("[ {} {} ", "Terminal Download Manager", symbols::DOT),
+            Style::default().fg(Color::Blue),
+        ),
+        Span::styled(
+            format!("{} ", "v0.0.1"),
+            Style::default().fg(Color::LightCyan),
+        ),
+        Span::styled("]", Style::default().fg(Color::Blue)),
+    ];
 
-    let title_text = Text::styled(
-        "Terminal Download Manager",
-        Style::default().fg(Color::Blue),
-    )
-    .centered();
-
-    let title_paragraph = Paragraph::new(title_text).block(title_block);
-
-    title_paragraph
+    let title_block = Line::from(title_span).right_aligned();
+    title_block
 }
