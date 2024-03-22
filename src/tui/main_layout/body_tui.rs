@@ -1,5 +1,5 @@
 use ratatui::{
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
@@ -25,7 +25,7 @@ pub fn popup_editing_layout() -> Block<'static> {
     let popup_component = Block::default()
         .title("Enter a URI")
         .borders(Borders::NONE)
-        .style(Style::default().bg(Color::White));
+        .style(Style::default().fg(Color::White).bg(Color::Blue));
 
     popup_component
 }
