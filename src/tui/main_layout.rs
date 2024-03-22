@@ -11,51 +11,57 @@ use ratatui::{
 use crate::{AppTui, CurrentScreen};
 
 use self::{
-    body_tui::{body_comp, input_editing, popup_editing_layout, popup_exit},
+    body_tui::{body_comp, download_process, input_editing, popup_exit},
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
 };
 
 pub fn ui(frame: &mut Frame, app: &AppTui) {
-    let chunk = Layout::default()
+    let screen = Layout::default()
         .direction(Direction::Vertical)
-        .margin(3)
         .constraints([
-            Constraint::Length(3),
-            Constraint::Min(1),
+            Constraint::Max(1),
+            Constraint::Fill(1),
             Constraint::Length(3),
         ])
         .split(frame.size());
 
+    let body_layout = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Fill(1), Constraint::Fill(2)])
+        .split(screen[1]);
+
+    //header
     let title = header_comp();
+    frame.render_widget(title, screen[0]);
 
-    frame.render_widget(title, chunk[0]);
-
+    //left body
     let list = body_comp(app);
+    frame.render_widget(list, body_layout[0]);
 
-    frame.render_widget(list, chunk[1]);
+    //right body
+
+    let right_body_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(25), Constraint::Percentage(75)])
+        .split(body_layout[1]);
+
+    let input_par = input_editing(app);
+    frame.render_widget(input_par, right_body_layout[0]);
+
+    let download_process = download_process();
+    frame.render_widget(download_process, right_body_layout[1]);
 
     let footer_chunk = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-        .split(chunk[2]);
+        .split(screen[2]);
 
     let mode_footer = footer_comp_mode(app);
     let key_notes_footer = footer_comp_notes(app);
 
     frame.render_widget(mode_footer, footer_chunk[0]);
     frame.render_widget(key_notes_footer, footer_chunk[1]);
-
-    let area_popup = centered_rect(60, 25, frame.size());
-
-    let popup_component = popup_editing_layout();
-
-    let input_comp = popup_component.inner(area_popup);
-    frame.render_widget(popup_component, area_popup);
-
-    let input_par = input_editing(app);
-
-    frame.render_widget(input_par, input_comp);
 
     if let CurrentScreen::Exiting = app.curr_screen {
         frame.render_widget(Clear, frame.size());
