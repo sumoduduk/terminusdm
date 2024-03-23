@@ -1,9 +1,10 @@
 use std::time::{Duration, Instant};
 
-use crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use crossterm::event::{self, Event, KeyCode};
 use ratatui::{backend::Backend, Terminal};
+use tui_input::backend::crossterm::EventHandler;
 
-use crate::{AppTui, CurrentScreen};
+use crate::{AppTui, CurrentScreen, InputMode};
 
 use super::main_layout::ui;
 
@@ -26,7 +27,7 @@ pub fn run_app<B: Backend>(
 
                 match app.curr_screen {
                     CurrentScreen::Main => match key.code {
-                        KeyCode::Char('e') => app.curr_screen = CurrentScreen::Editing,
+                        KeyCode::Tab => app.curr_screen = CurrentScreen::Editing,
                         KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
                         _ => {}
                     },
@@ -36,22 +37,24 @@ pub fn run_app<B: Backend>(
                         KeyCode::Char('n') | KeyCode::Char('q') => return Ok(false),
                         _ => (),
                     },
-                    CurrentScreen::Editing if key.kind == KeyEventKind::Press => match key.code {
-                        KeyCode::Enter => {
-                            app.save_input();
-                        }
-                        KeyCode::Backspace => {
-                            app.input_uri.pop();
-                        }
-                        KeyCode::Esc => {
-                            app.curr_screen = CurrentScreen::Main;
-                        }
-                        KeyCode::Char(char_input) => {
-                            app.input_uri.push(char_input);
-                        }
-                        _ => {}
+                    CurrentScreen::Editing => match app.input_mode {
+                        InputMode::Normal => match key.code {
+                            KeyCode::Char('i') => app.input_mode = InputMode::Editing,
+                            KeyCode::Tab => app.curr_screen = CurrentScreen::Main,
+                            _ => {}
+                        },
+                        InputMode::Editing => match key.code {
+                            KeyCode::Enter => app.save_input(),
+                            KeyCode::Esc => app.input_mode = InputMode::Normal,
+                            KeyCode::Tab => {
+                                app.input_mode = InputMode::Normal;
+                                app.curr_screen = CurrentScreen::Main;
+                            }
+                            _ => {
+                                app.input_uri.handle_event(&Event::Key(key));
+                            }
+                        },
                     },
-                    _ => {}
                 }
             }
         }
