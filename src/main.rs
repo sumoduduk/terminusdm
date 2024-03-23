@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, time::Duration};
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
@@ -17,7 +17,9 @@ async fn main() -> eyre::Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
     let mut app = tdm::AppTui::new();
 
-    let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app);
+    let tick_rate = Duration::from_millis(250);
+
+    let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app, tick_rate);
 
     disable_raw_mode()?;
     execute!(
