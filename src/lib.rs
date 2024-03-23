@@ -6,6 +6,7 @@ mod utils;
 
 use eyre::{eyre, OptionExt};
 use req_lib::HeaderObject;
+use tui_input::Input;
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
 
@@ -15,8 +16,14 @@ enum CurrentScreen {
     Exiting,
 }
 
+enum InputMode {
+    Normal,
+    Editing,
+}
+
 pub struct AppTui {
-    input_uri: String,
+    input_uri: Input,
+    input_mode: InputMode,
     curr_screen: CurrentScreen,
     saved_input: Vec<String>,
 }
@@ -24,15 +31,16 @@ pub struct AppTui {
 impl AppTui {
     pub fn new() -> Self {
         Self {
-            input_uri: String::new(),
+            input_uri: Input::default(),
+            input_mode: InputMode::Normal,
             curr_screen: CurrentScreen::Main,
             saved_input: Vec::new(),
         }
     }
 
     fn save_input(&mut self) {
-        self.saved_input.push(self.input_uri.clone());
-        self.input_uri = String::new()
+        self.saved_input.push(self.input_uri.value().into());
+        self.input_uri.reset();
     }
 
     pub fn print_vec(&self) -> eyre::Result<()> {
