@@ -46,8 +46,20 @@ pub fn ui(frame: &mut Frame, app: &AppTui) {
         .constraints([Constraint::Percentage(25), Constraint::Percentage(75)])
         .split(body_layout[1]);
 
-    let input_par = input_editing(app);
+    let width = right_body_layout[0].width.max(3) - 3;
+
+    let scroll_input = app.input_uri.visual_scroll(width as usize);
+    let input_par = input_editing(app, width);
     frame.render_widget(input_par, right_body_layout[0]);
+
+    match app.input_mode {
+        crate::InputMode::Normal => {}
+        crate::InputMode::Editing => frame.set_cursor(
+            right_body_layout[0].x
+                + ((app.input_uri.visual_cursor().max(scroll_input) - scroll_input) as u16 + 1),
+            right_body_layout[0].y + 1,
+        ),
+    }
 
     let download_process = download_process();
     frame.render_widget(download_process, right_body_layout[1]);
