@@ -1,4 +1,4 @@
-use std::{io, time::Duration};
+use std::{io, thread, time::Duration};
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
@@ -9,35 +9,44 @@ use ratatui::{backend::CrosstermBackend, Terminal};
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
-    enable_raw_mode()?;
-    let mut stderr = io::stderr();
+    loop {
+        enable_raw_mode()?;
+        let mut stderr = io::stderr();
 
-    execute!(stderr, EnterAlternateScreen, EnableMouseCapture)?;
+        execute!(stderr, EnterAlternateScreen, EnableMouseCapture)?;
 
-    let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
-    let mut app = tdm::AppTui::new();
+        let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
+        let mut app = tdm::AppTui::new();
 
-    let tick_rate = Duration::from_millis(250);
+        let tick_rate = Duration::from_millis(250);
 
-    let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app, tick_rate);
+        let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app, tick_rate);
 
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    terminal.show_cursor()?;
+        disable_raw_mode()?;
+        execute!(
+            terminal.backend_mut(),
+            LeaveAlternateScreen,
+            DisableMouseCapture
+        )?;
+        terminal.show_cursor()?;
+        terminal.clear()?;
 
-    match res {
-        Ok(do_print) => {
-            if do_print {
-                app.print_vec()?;
+        match res {
+            Ok(do_print) => {
+                if do_print {
+                    app.print_vec()?;
+                } else {
+                    break;
+                }
+            }
+            Err(err) => {
+                println!("{}", err.to_string());
+                break;
             }
         }
-        Err(err) => {
-            println!("{}", err.to_string());
-        }
+
+        let time = Duration::from_secs(3);
+        thread::sleep(time);
     }
 
     Ok(())
