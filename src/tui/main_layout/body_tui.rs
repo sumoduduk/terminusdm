@@ -1,16 +1,23 @@
 use ratatui::{
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
+    widgets::{Block, BorderType, Borders, List, ListItem, Paragraph, Wrap},
 };
 
-use crate::AppTui;
+use crate::{AppTui, InputMode};
 
 pub fn body_comp(app: &AppTui) -> List<'static> {
     let block_body = Block::default()
         .title("Download History")
         .borders(Borders::ALL)
-        .border_style(Style::default());
+        .border_style(match app.curr_screen {
+            crate::CurrentScreen::Main => Style::default().fg(Color::Cyan),
+            _ => Style::default(),
+        })
+        .border_type(match app.curr_screen {
+            crate::CurrentScreen::Main => BorderType::Thick,
+            _ => BorderType::Rounded,
+        });
 
     let mut list_item: Vec<ListItem> = Vec::new();
 
@@ -26,14 +33,30 @@ pub fn body_comp(app: &AppTui) -> List<'static> {
     list
 }
 
-pub fn input_editing(app: &AppTui) -> Paragraph<'static> {
+pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
+    let scroll_input = app.input_uri.visual_scroll(width as usize);
+
     let input_components = Block::default()
         .title("Enter a URI")
         .borders(Borders::ALL)
-        .border_style(Style::default());
+        .border_style(match app.curr_screen {
+            crate::CurrentScreen::Editing => Style::default().fg(Color::Cyan),
+            _ => Style::default(),
+        })
+        .border_type(match app.curr_screen {
+            crate::CurrentScreen::Editing => BorderType::Thick,
+            _ => BorderType::Rounded,
+        });
 
-    let input_par = Paragraph::new(app.input_uri.clone())
+    let value = app.input_uri.value();
+
+    let input_par = Paragraph::new(value.to_string())
+        .style(match app.input_mode {
+            InputMode::Normal => Style::default(),
+            InputMode::Editing => Style::default().fg(Color::Magenta),
+        })
         .block(input_components)
+        .scroll((0, scroll_input as u16))
         .wrap(Wrap { trim: false });
 
     input_par
