@@ -37,16 +37,16 @@ pub fn footer_comp_notes(app: &AppTui) -> Paragraph<'static> {
     let current_keys_hint = {
         match app.curr_screen {
             CurrentScreen::Main => Span::styled(
-                "(q) to quit / (e) to make new pair",
-                Style::default().fg(Color::Red),
+                "(q) to quit / Tab to switch",
+                Style::default().fg(Color::LightRed),
             ),
             CurrentScreen::Editing => Span::styled(
                 "(ESC) to cancel/(Tab) to switch boxes/enter to complete",
-                Style::default().fg(Color::Red),
+                Style::default().fg(Color::LightBlue),
             ),
             CurrentScreen::Exiting => Span::styled(
                 "(q) to quit / (e) to make new pair",
-                Style::default().fg(Color::Red),
+                Style::default().fg(Color::LightGreen),
             ),
         }
     };
