@@ -1,21 +1,21 @@
 use ratatui::{
-    style::{Color, Style, Stylize},
+    style::{Color, Style},
     text::{Line, Span, Text},
     widgets::{Block, BorderType, Borders, List, ListItem, Paragraph, Wrap},
 };
 
-use crate::{AppTui, InputMode};
+use crate::tui::app::{AppTui, CurrentScreen, InputMode};
 
 pub fn body_comp(app: &AppTui) -> List<'static> {
     let block_body = Block::default()
         .title("Download History")
         .borders(Borders::ALL)
         .border_style(match app.curr_screen {
-            crate::CurrentScreen::Main => Style::default().fg(Color::Cyan),
+            CurrentScreen::Main => Style::default().fg(Color::Cyan),
             _ => Style::default(),
         })
         .border_type(match app.curr_screen {
-            crate::CurrentScreen::Main => BorderType::Thick,
+            CurrentScreen::Main => BorderType::Thick,
             _ => BorderType::Rounded,
         });
 
@@ -40,11 +40,11 @@ pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
         .title("Enter a URI")
         .borders(Borders::ALL)
         .border_style(match app.curr_screen {
-            crate::CurrentScreen::Editing => Style::default().fg(Color::Cyan),
+            CurrentScreen::Editing => Style::default().fg(Color::Cyan),
             _ => Style::default(),
         })
         .border_type(match app.curr_screen {
-            crate::CurrentScreen::Editing => BorderType::Thick,
+            CurrentScreen::Editing => BorderType::Thick,
             _ => BorderType::Rounded,
         });
 
@@ -56,16 +56,23 @@ pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
             InputMode::Editing => Style::default().fg(Color::Magenta),
         })
         .block(input_components)
-        .scroll((0, scroll_input as u16))
-        .wrap(Wrap { trim: false });
+        .scroll((0, scroll_input as u16));
 
     input_par
 }
 
-pub fn download_process() -> Block<'static> {
+pub fn user_settings(app: &AppTui) -> Block<'static> {
     Block::default()
-        .title("Download Process")
+        .title("Setting")
         .borders(Borders::ALL)
+        .border_style(match app.curr_screen {
+            CurrentScreen::Setting => Style::default().fg(Color::Cyan),
+            _ => Style::default(),
+        })
+        .border_type(match app.curr_screen {
+            CurrentScreen::Setting => BorderType::Thick,
+            _ => BorderType::Rounded,
+        })
 }
 
 pub fn popup_exit() -> Paragraph<'static> {
