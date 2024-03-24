@@ -4,12 +4,13 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
 };
 
-use crate::{AppTui, CurrentScreen};
+use crate::tui::app::{AppTui, CurrentScreen};
 
 pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
     let cur_span = match app.curr_screen {
-        CurrentScreen::Main => Span::styled("Normal Mode", Style::default().fg(Color::Green)),
+        CurrentScreen::Main => Span::styled("Table Mode", Style::default().fg(Color::Green)),
         CurrentScreen::Editing => Span::styled("Editing Mode", Style::default().fg(Color::Yellow)),
+        CurrentScreen::Setting => Span::styled("Setting Mode", Style::default().fg(Color::Blue)),
         CurrentScreen::Exiting => Span::styled("Exiting", Style::default().fg(Color::LightRed)),
     };
 
@@ -44,10 +45,13 @@ pub fn footer_comp_notes(app: &AppTui) -> Paragraph<'static> {
                 "(ESC) to cancel/(Tab) to switch boxes/enter to complete",
                 Style::default().fg(Color::LightBlue),
             ),
-            CurrentScreen::Exiting => Span::styled(
-                "(q) to quit / (e) to make new pair",
-                Style::default().fg(Color::LightGreen),
+            CurrentScreen::Setting => Span::styled(
+                "(q) to quit / (Tab) to switch boxes/enter to complete",
+                Style::default().fg(Color::LightBlue),
             ),
+            CurrentScreen::Exiting => {
+                Span::styled("(q) to quit", Style::default().fg(Color::LightGreen))
+            }
         }
     };
 
