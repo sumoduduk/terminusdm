@@ -1,3 +1,5 @@
+pub mod to_vec;
+
 pub fn create_range(num: u64, divisor: u64) -> Option<Vec<(u64, u64)>> {
     if divisor == 0 {
         return None;
