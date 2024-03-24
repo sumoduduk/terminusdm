@@ -8,66 +8,69 @@ use ratatui::{
     Frame,
 };
 
-use crate::{AppTui, CurrentScreen};
-
 use self::{
-    body_tui::{body_comp, download_process, input_editing, popup_exit},
+    body_tui::{body_comp, input_editing, popup_exit, user_settings},
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
 };
 
+use super::app::{AppTui, CurrentScreen, InputMode};
+
 pub fn ui(frame: &mut Frame, app: &AppTui) {
     let screen = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Max(1),
-            Constraint::Fill(1),
-            Constraint::Length(3),
-        ])
+        .constraints([Constraint::Fill(1), Constraint::Length(3)])
         .split(frame.size());
 
     let body_layout = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Fill(1), Constraint::Fill(2)])
-        .split(screen[1]);
-
-    //header
-    let title = header_comp();
-    frame.render_widget(title, screen[0]);
-
-    //left body
-    let list = body_comp(app);
-    frame.render_widget(list, body_layout[0]);
-
-    //right body
-
-    let right_body_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Percentage(25), Constraint::Percentage(75)])
-        .split(body_layout[1]);
+        .split(screen[0]);
 
-    let width = right_body_layout[0].width.max(3) - 3;
+    let upper_body = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(75), Constraint::Percentage(25)])
+        .split(body_layout[0]);
+
+    //title
+
+    let title = header_comp();
+
+    frame.render_widget(title, upper_body[1]);
+
+    //lower body - table
+    let list = body_comp(app);
+    frame.render_widget(list, body_layout[1]);
+
+    //upper body
+    let input_setting_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(3), Constraint::Fill(1)])
+        .split(upper_body[0]);
+
+    let width = input_setting_layout[0].width.max(3) - 3;
 
     let scroll_input = app.input_uri.visual_scroll(width as usize);
     let input_par = input_editing(app, width);
-    frame.render_widget(input_par, right_body_layout[0]);
+    frame.render_widget(input_par, input_setting_layout[0]);
 
     match app.input_mode {
-        crate::InputMode::Normal => {}
-        crate::InputMode::Editing => frame.set_cursor(
-            right_body_layout[0].x
+        InputMode::Normal => {}
+        InputMode::Editing => frame.set_cursor(
+            input_setting_layout[0].x
                 + ((app.input_uri.visual_cursor().max(scroll_input) - scroll_input) as u16 + 1),
-            right_body_layout[0].y + 1,
+            input_setting_layout[0].y + 1,
         ),
     }
 
-    let download_process = download_process();
-    frame.render_widget(download_process, right_body_layout[1]);
+    let setting = user_settings(app);
+    frame.render_widget(setting, input_setting_layout[1]);
 
+    //footer
     let footer_chunk = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-        .split(screen[2]);
+        .split(screen[1]);
 
     let mode_footer = footer_comp_mode(app);
     let key_notes_footer = footer_comp_notes(app);
