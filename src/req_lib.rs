@@ -27,8 +27,8 @@ impl HeaderObject {
     pub fn is_ranges(&self) -> eyre::Result<bool> {
         let accpe_ranges = match self.header.get(ACCEPT_RANGES) {
             None => Err(eyre!("Not Resumable")),
-            Some(_) => Ok(true),
             Some(x) if x == "none" => Err(eyre!("Not Resumable")),
+            Some(_) => Ok(true),
         };
         accpe_ranges
     }
