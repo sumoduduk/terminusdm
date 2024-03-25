@@ -8,7 +8,7 @@ edition = "2021"
 
 [lints.rust]
 unsafe_code = "forbid"
-# unused = "allow" # For exploratory dev.
+unused = "allow" # For exploratory dev.
 
 [dependencies]
 dirs = "5.0.1"
