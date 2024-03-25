@@ -71,14 +71,17 @@ impl Histories {
             .and_modify(|h| h.stage_download = stage);
     }
 
-    pub fn add_history(&mut self, download_history: HistoryDownload) {
+    pub fn add_history(&mut self, download_history: HistoryDownload) -> u32 {
         let last = self
             .history
             .last_key_value()
             .and_then(|l| Some(*l.0))
             .unwrap_or_default();
 
-        self.history.insert(last + 1, download_history);
+        let key = last + 1;
+
+        self.history.insert(key, download_history);
+        key
     }
 
     pub fn save_history(&self, history_filename: &str) -> eyre::Result<()> {
