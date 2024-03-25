@@ -7,6 +7,7 @@ mod utils;
 use eyre::{eyre, OptionExt};
 use req_lib::HeaderObject;
 use serde::{Deserialize, Serialize};
+use tui::app::AppTui;
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
 
@@ -25,7 +26,7 @@ pub struct HistoryDownload {
     stage_download: DownloadStage,
 }
 
-pub async fn download_chunk(download_uri: &str) -> eyre::Result<()> {
+pub async fn download_chunk(app: &mut AppTui, download_uri: &str) -> eyre::Result<()> {
     let header_obj = HeaderObject::new(download_uri).await?;
     if !header_obj.is_ranges()? {
         //todo still download even is not range
@@ -41,30 +42,30 @@ pub async fn download_chunk(download_uri: &str) -> eyre::Result<()> {
         .get_filename()
         .ok_or_eyre("Error: Can't get file_name")?;
 
+    let history_download = HistoryDownload {
+        file_name: file_name.clone(),
+        url: download_uri.to_string(),
+        stage_download: DownloadStage::READY,
+    };
+
+    let key = app.add_history(history_download);
+    app.save_history();
+
     let download_path = dir_home.join("Downloads").join("tdm");
 
     let temp = download_path.join("temp").join(&file_name);
 
+    app.update_stage(key, DownloadStage::DOWNLOADING);
+    app.save_history();
     let res = start_download(temp.clone(), &header_obj.get_url(), &ranges).await;
 
     if let Ok(_) = res {
+        app.update_stage(key, DownloadStage::MERGING);
+        app.save_history();
         merge(&temp, ranges.len(), &download_path, &file_name).await?;
+        app.update_stage(key, DownloadStage::COMPLETE);
+        app.save_history();
     }
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const URI : &str = "https://huggingface.co/datasets/ym0v0my/Time_series_dataset/resolve/main/all_six_datasets.zip?download=true";
-
-    #[tokio::test]
-    async fn test_download() -> eyre::Result<()> {
-        let ranges = download_chunk(&URI).await;
-        dbg!(&ranges);
-        assert!(ranges.is_ok());
-        Ok(())
-    }
 }
