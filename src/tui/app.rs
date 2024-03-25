@@ -1,5 +1,11 @@
-use crate::utils::to_vec::string_to_vec;
+mod history;
+
+use crate::{utils::to_vec::string_to_vec, DownloadStage, HistoryDownload};
 use tui_input::Input;
+
+use self::history::Histories;
+
+const HISTORY_FILE_NAME: &str = "history.ron";
 
 pub enum CurrentScreen {
     Main,
@@ -18,6 +24,7 @@ pub struct AppTui {
     pub input_mode: InputMode,
     pub curr_screen: CurrentScreen,
     pub saved_input: Vec<String>,
+    pub history: Histories,
 }
 
 impl AppTui {
@@ -27,6 +34,7 @@ impl AppTui {
             input_mode: InputMode::Normal,
             curr_screen: CurrentScreen::Main,
             saved_input: Vec::new(),
+            history: Histories::new(HISTORY_FILE_NAME),
         }
     }
 
@@ -46,6 +54,16 @@ impl AppTui {
     pub fn print_vec(&self) -> eyre::Result<()> {
         let output = serde_json::to_string_pretty(&self.saved_input)?;
         println!("{}", output);
+        Ok(())
+    }
+
+    pub fn add_history(&mut self, download_history: HistoryDownload) {}
+
+    pub fn update_stage(&mut self, num: u32, stage: DownloadStage) {
+        self.history.update_stage(num, stage);
+    }
+    pub fn save_history(&self) -> eyre::Result<()> {
+        self.history.save_history(HISTORY_FILE_NAME)?;
         Ok(())
     }
 }
