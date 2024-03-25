@@ -57,7 +57,10 @@ impl AppTui {
         Ok(())
     }
 
-    pub fn add_history(&mut self, download_history: HistoryDownload) {}
+    pub fn add_history(&mut self, download_history: HistoryDownload) -> u32 {
+        let key = self.history.add_history(download_history);
+        key
+    }
 
     pub fn update_stage(&mut self, num: u32, stage: DownloadStage) {
         self.history.update_stage(num, stage);
