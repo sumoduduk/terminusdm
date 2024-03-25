@@ -6,12 +6,29 @@ mod utils;
 
 use eyre::{eyre, OptionExt};
 use req_lib::HeaderObject;
+use serde::{Deserialize, Serialize};
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum DownloadStage {
+    READY,
+    DOWNLOADING,
+    MERGING,
+    COMPLETE,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct HistoryDownload {
+    file_name: String,
+    url: String,
+    stage_download: DownloadStage,
+}
 
 pub async fn download_chunk(download_uri: &str) -> eyre::Result<()> {
     let header_obj = HeaderObject::new(download_uri).await?;
     if !header_obj.is_ranges()? {
+        //todo still download even is not range
         return Err(eyre!("ERROR : File Download Not Resumable"));
     }
 
