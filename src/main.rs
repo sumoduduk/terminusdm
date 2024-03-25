@@ -1,4 +1,4 @@
-use std::{io, thread, time::Duration};
+use std::io;
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
@@ -32,14 +32,13 @@ async fn main() -> eyre::Result<()> {
         match res {
             Ok(do_print) => {
                 if do_print {
-                    // app.print_vec()?;
-                    let vec_value = app.saved_input;
+                    let vec_value = &app.saved_input.clone();
                     if vec_value.is_empty() {
                         println!("empty");
                     } else {
-                        for input_value in &vec_value {
+                        for input_value in vec_value {
                             println!("Downloading file : {}", input_value);
-                            tdm::download_chunk(input_value).await?;
+                            tdm::download_chunk(&mut app, input_value).await?;
                         }
                     }
                 } else {
@@ -51,9 +50,6 @@ async fn main() -> eyre::Result<()> {
                 break;
             }
         }
-
-        // let time = Duration::from_secs(3);
-        // thread::sleep(time);
     }
 
     Ok(())
