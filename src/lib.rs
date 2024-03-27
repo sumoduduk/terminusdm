@@ -35,10 +35,36 @@ pub struct HistoryDownload {
     file_name: String,
     url: String,
     stage_download: DownloadStage,
+    is_resumable: bool,
+    sizes: u64,
+    total_chunk: u64,
 }
 
 //need fix
 impl HistoryDownload {
+    async fn new(uri: &str) -> eyre::Result<Self> {
+        let header_obj = HeaderObject::new(uri).await?;
+        let is_resumable = header_obj.is_ranges()?;
+        let file_name = header_obj
+            .get_filename()
+            .ok_or_eyre("Error: Can't get file_name")?;
+
+        let sizes = header_obj.get_sizes()?;
+
+        //TODO : load total_chunk from config
+        //
+        let hist = Self {
+            file_name,
+            url: uri.to_string(),
+            stage_download: DownloadStage::READY,
+            is_resumable,
+            total_chunk: 16,
+            sizes,
+        };
+
+        Ok(hist)
+    }
+
     fn ref_array(&self) -> [String; 3] {
         [
             self.file_name.clone(),
@@ -76,29 +102,29 @@ pub async fn download_chunk(app: &mut AppTui, download_uri: &str) -> eyre::Resul
         .get_filename()
         .ok_or_eyre("Error: Can't get file_name")?;
 
-    let history_download = HistoryDownload {
-        file_name: file_name.clone(),
-        url: download_uri.to_string(),
-        stage_download: DownloadStage::READY,
-    };
-
-    let key = app.add_history(history_download);
-    app.save_history();
+    // let history_download = HistoryDownload {
+    //     file_name: file_name.clone(),
+    //     url: download_uri.to_string(),
+    //     stage_download: DownloadStage::READY,
+    // };
+    //
+    // let key = app.add_history(history_download);
+    // app.save_history();
 
     let download_path = dir_home.join("Downloads").join("tdm");
 
     let temp = download_path.join("temp").join(&file_name);
 
-    app.update_stage(key, DownloadStage::DOWNLOADING);
-    app.save_history();
+    // app.update_stage(key, DownloadStage::DOWNLOADING);
+    // app.save_history();
     let res = start_download(temp.clone(), &header_obj.get_url(), &ranges).await;
 
     if let Ok(_) = res {
-        app.update_stage(key, DownloadStage::MERGING);
-        app.save_history();
+        // app.update_stage(key, DownloadStage::MERGING);
+        // app.save_history();
         merge(&temp, ranges.len(), &download_path, &file_name).await?;
-        app.update_stage(key, DownloadStage::COMPLETE);
-        app.save_history();
+        // app.update_stage(key, DownloadStage::COMPLETE);
+        // app.save_history();
     }
 
     Ok(())
