@@ -6,7 +6,12 @@ mod utils;
 
 use eyre::{eyre, OptionExt};
 use req_lib::HeaderObject;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
+use trauma::{
+    download::Download,
+    downloader::{Downloader, DownloaderBuilder},
+};
 use tui::app::AppTui;
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
@@ -86,46 +91,43 @@ impl HistoryDownload {
     }
 }
 
-pub async fn download_chunk(app: &mut AppTui, download_uri: &str) -> eyre::Result<()> {
-    let header_obj = HeaderObject::new(download_uri).await?;
-    if !header_obj.is_ranges()? {
-        //todo still download even is not range
-        return Err(eyre!("ERROR : File Download Not Resumable"));
-    }
+pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
+    let history = app.get_history(key)?.clone();
+    let url = history.url();
+    println!("Begin Download : {url}");
 
-    let sizes = header_obj.get_sizes()?;
-
-    let ranges = create_range(sizes, 16).ok_or_eyre("Error: divisor should be non-zero")?;
+    let is_resumable = &history.is_resumable;
 
     let dir_home = dirs::home_dir().ok_or_eyre("ERROR: failed to get home dir")?;
-    let file_name = header_obj
-        .get_filename()
-        .ok_or_eyre("Error: Can't get file_name")?;
-
-    // let history_download = HistoryDownload {
-    //     file_name: file_name.clone(),
-    //     url: download_uri.to_string(),
-    //     stage_download: DownloadStage::READY,
-    // };
-    //
-    // let key = app.add_history(history_download);
-    // app.save_history();
-
     let download_path = dir_home.join("Downloads").join("tdm");
+    if !is_resumable {
+        let downloder = vec![Download::try_from(url)?];
+        let build = DownloaderBuilder::new()
+            .directory(download_path.clone())
+            .build();
+        build.download(&downloder).await;
+    } else {
+        let file_name = &history.file_name;
+        let sizes = &history.sizes;
+        let total_chunk = &history.total_chunk;
+        let url = Url::parse(url)?;
 
-    let temp = download_path.join("temp").join(&file_name);
+        let ranges =
+            create_range(*sizes, *total_chunk).ok_or_eyre("Error: divisor should be non-zero")?;
 
-    // app.update_stage(key, DownloadStage::DOWNLOADING);
-    // app.save_history();
-    let res = start_download(temp.clone(), &header_obj.get_url(), &ranges).await;
+        let temp = download_path.join("temp").join(&file_name);
 
-    if let Ok(_) = res {
-        // app.update_stage(key, DownloadStage::MERGING);
-        // app.save_history();
-        merge(&temp, ranges.len(), &download_path, &file_name).await?;
-        // app.update_stage(key, DownloadStage::COMPLETE);
-        // app.save_history();
+        app.update_stage(key, DownloadStage::DOWNLOADING);
+        app.save_history();
+        let res = start_download(temp.clone(), &url, &ranges).await;
+
+        if let Ok(_) = res {
+            app.update_stage(key, DownloadStage::MERGING);
+            app.save_history();
+            merge(&temp, ranges.len(), &download_path, &file_name).await?;
+            app.update_stage(key, DownloadStage::COMPLETE);
+            app.save_history();
+        }
     }
-
     Ok(())
 }
