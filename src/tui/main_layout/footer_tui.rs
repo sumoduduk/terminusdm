@@ -12,6 +12,9 @@ pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
         CurrentScreen::Editing => Span::styled("Editing Mode", Style::default().fg(Color::Yellow)),
         CurrentScreen::Setting => Span::styled("Setting Mode", Style::default().fg(Color::Blue)),
         CurrentScreen::Exiting => Span::styled("Exiting", Style::default().fg(Color::LightRed)),
+        CurrentScreen::ErrorScreen => {
+            Span::styled("ERROR MESSAGE", Style::default().fg(Color::LightRed))
+        }
     };
 
     let divider_span = Span::styled(" | ", Style::default().fg(Color::White));
@@ -49,9 +52,7 @@ pub fn footer_comp_notes(app: &AppTui) -> Paragraph<'static> {
                 "(q) to quit / (Tab) to switch boxes/enter to complete",
                 Style::default().fg(Color::LightBlue),
             ),
-            CurrentScreen::Exiting => {
-                Span::styled("(q) to quit", Style::default().fg(Color::LightGreen))
-            }
+            _ => Span::styled("(q) to quit", Style::default().fg(Color::LightGreen)),
         }
     };
 
