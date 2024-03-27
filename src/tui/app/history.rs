@@ -57,7 +57,7 @@ impl Histories {
         Ok(())
     }
 
-    fn get_history_by_idx(&self, num: usize) -> eyre::Result<(&u32, &HistoryDownload)> {
+    pub fn get_history_by_idx(&self, num: usize) -> eyre::Result<(&u32, &HistoryDownload)> {
         let res = self
             .history
             .get_index(num)
@@ -65,7 +65,7 @@ impl Histories {
         Ok(res)
     }
 
-    fn get_history(&self, num: u32) -> eyre::Result<&HistoryDownload> {
+    pub fn get_history(&self, num: u32) -> eyre::Result<&HistoryDownload> {
         let res = self
             .history
             .get(&num)
