@@ -1,4 +1,5 @@
 mod body_tui;
+mod error_popup;
 mod footer_tui;
 mod header_tui;
 mod table_layout;
@@ -11,6 +12,7 @@ use ratatui::{
 
 use self::{
     body_tui::{body_comp, input_editing, popup_exit, user_settings},
+    error_popup::popup_error,
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
     table_layout::{render_scrollbar_table, render_table},
@@ -79,6 +81,15 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
     frame.render_widget(mode_footer, footer_chunk[0]);
     frame.render_widget(key_notes_footer, footer_chunk[1]);
+
+    if let CurrentScreen::ErrorScreen = app.curr_screen {
+        frame.render_widget(Clear, frame.size());
+
+        let error_widget = popup_error(app);
+
+        let area = centered_rect(60, 25, frame.size());
+        frame.render_widget(error_widget, area);
+    }
 
     if let CurrentScreen::Exiting = app.curr_screen {
         frame.render_widget(Clear, frame.size());
