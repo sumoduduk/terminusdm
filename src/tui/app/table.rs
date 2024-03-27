@@ -20,7 +20,7 @@ pub struct TableColors {
     pub selected_style_fg: Color,
     pub normal_row_color: Color,
     pub alt_row_color: Color,
-    pub footer_border_color: Color,
+    pub picked_color: Color,
 }
 
 impl TableColors {
@@ -33,7 +33,7 @@ impl TableColors {
             selected_style_fg: color.c400,
             normal_row_color: tailwind::SLATE.c950,
             alt_row_color: tailwind::SLATE.c900,
-            footer_border_color: color.c400,
+            picked_color: tailwind::ROSE.c600,
         }
     }
 }
@@ -43,6 +43,7 @@ pub struct Table {
     pub scroll_state: ScrollbarState,
     pub colors: TableColors,
     pub total_len: usize,
+    pub picked: Vec<usize>,
 }
 
 impl Table {
@@ -52,6 +53,7 @@ impl Table {
             scroll_state: ScrollbarState::new(len),
             colors: TableColors::new(&PALETTES[0]),
             total_len: len,
+            picked: Vec::new(),
         }
     }
 
@@ -85,5 +87,17 @@ impl Table {
 
         self.state.select(Some(index));
         self.scroll_state = self.scroll_state.position(index + ITEM_HEIGHT);
+    }
+    pub fn pick(&mut self) {
+        match self.state.selected() {
+            Some(index) => {
+                if let Some(i) = self.picked.iter().position(|val| val == &index) {
+                    self.picked.swap_remove(i);
+                } else {
+                    self.picked.push(index)
+                }
+            }
+            None => {}
+        };
     }
 }
