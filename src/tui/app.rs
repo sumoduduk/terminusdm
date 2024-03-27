@@ -1,9 +1,8 @@
 mod history;
 mod table;
 
-use std::collections::BTreeMap;
-
 use crate::{utils::to_vec::string_to_vec, DownloadStage, HistoryDownload};
+use indexmap::IndexMap;
 use tui_input::Input;
 
 use self::history::Histories;
@@ -74,7 +73,7 @@ impl AppTui {
         Ok(())
     }
 
-    pub fn list_history(&self) -> &BTreeMap<u32, HistoryDownload> {
+    pub fn list_history(&self) -> &IndexMap<u32, HistoryDownload> {
         self.history.list()
     }
 
