@@ -30,11 +30,14 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         .style(header_style)
         .height(1);
 
-    let rows = app.list_history().iter().map(|(i, data)| {
-        let color = match i % 2 {
-            0 => app.table.colors.normal_row_color,
+    let rows = app.list_history().iter().enumerate().map(|(i, data)| {
+        let color = match i {
+            num if app.table.picked.contains(&num) => app.table.colors.picked_color,
+            num if num % 2 == 0 => app.table.colors.normal_row_color,
             _ => app.table.colors.alt_row_color,
         };
+
+        let (_, data) = data;
 
         let item = data.ref_array();
 
