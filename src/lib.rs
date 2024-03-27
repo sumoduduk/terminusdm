@@ -19,11 +19,45 @@ pub enum DownloadStage {
     COMPLETE,
 }
 
+impl ToString for DownloadStage {
+    fn to_string(&self) -> String {
+        match self {
+            DownloadStage::READY => String::from("READY"),
+            DownloadStage::DOWNLOADING => String::from("DOWNLOADING"),
+            DownloadStage::MERGING => String::from("MERGING"),
+            DownloadStage::COMPLETE => String::from("COMPLETE"),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct HistoryDownload {
     file_name: String,
     url: String,
     stage_download: DownloadStage,
+}
+
+//need fix
+impl HistoryDownload {
+    fn ref_array(&self) -> [String; 3] {
+        [
+            self.file_name.clone(),
+            self.url.clone(),
+            self.stage_download.to_string(),
+        ]
+    }
+
+    fn file(&self) -> &str {
+        &self.file_name
+    }
+
+    fn url(&self) -> &str {
+        &self.url
+    }
+
+    fn status(&self) -> String {
+        self.stage_download.to_string()
+    }
 }
 
 pub async fn download_chunk(app: &mut AppTui, download_uri: &str) -> eyre::Result<()> {
