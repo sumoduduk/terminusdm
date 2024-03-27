@@ -53,8 +53,8 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let tables = Table::new(
         rows,
         [
-            Constraint::Length(column_width + 1),
-            Constraint::Min(column_width + 1),
+            Constraint::Length(column_width),
+            Constraint::Min(column_width * 2),
             Constraint::Min(column_width),
         ],
     )
