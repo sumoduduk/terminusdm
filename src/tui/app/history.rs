@@ -168,6 +168,9 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histories_arr.add_history(download_history);
@@ -192,6 +195,9 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histories_arr.add_history(download_history);
@@ -222,6 +228,9 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histories_arr.add_history(download_history);
@@ -231,6 +240,9 @@ mod tests {
             file_name: "test1.txt".to_owned(),
             url: "https://downlaod1.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histories_arr.add_history(download_history_1);
@@ -251,24 +263,36 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_1 = HistoryDownload {
             file_name: "test1.txt".to_owned(),
             url: "https://downlaod1.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_2 = HistoryDownload {
             file_name: "test2.txt".to_owned(),
             url: "https://downlaod2.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_3 = HistoryDownload {
             file_name: "test3.txt".to_owned(),
             url: "https://downlaod3.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histo_arr.add_history(download_history);
@@ -294,12 +318,18 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_1 = HistoryDownload {
             file_name: "test1.txt".to_owned(),
             url: "https://downlaod1.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histo_arr.add_history(download_history);
@@ -321,6 +351,9 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histo_arr.add_history(download_history);
@@ -342,24 +375,36 @@ mod tests {
             file_name: "test.txt".to_owned(),
             url: "https://downlaod.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_1 = HistoryDownload {
             file_name: "test1.txt".to_owned(),
             url: "https://downlaod1.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_2 = HistoryDownload {
             file_name: "test2.txt".to_owned(),
             url: "https://downlaod2.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         let download_history_3 = HistoryDownload {
             file_name: "test3.txt".to_owned(),
             url: "https://downlaod3.com".to_owned(),
             stage_download: DownloadStage::READY,
+            is_resumable: todo!(),
+            sizes: todo!(),
+            total_chunk: todo!(),
         };
 
         histo_arr.add_history(download_history);
