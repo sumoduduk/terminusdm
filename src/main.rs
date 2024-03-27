@@ -27,7 +27,7 @@ async fn main() -> eyre::Result<()> {
             DisableMouseCapture
         )?;
         terminal.show_cursor()?;
-        terminal.clear()?;
+        // terminal.clear()?;
 
         match res {
             Ok(do_print) => {
@@ -38,7 +38,7 @@ async fn main() -> eyre::Result<()> {
                     } else {
                         for input_value in vec_value {
                             println!("Downloading file : {}", input_value);
-                            tdm::download_chunk(&mut app, input_value).await?;
+                            // tdm::download_chunk(&mut app, input_value).await?;
                         }
                     }
                 } else {
