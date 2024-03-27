@@ -22,13 +22,19 @@ pub async fn run_app<B: Backend>(
             match app.curr_screen {
                 CurrentScreen::Main => match key.code {
                     KeyCode::Tab => app.curr_screen = CurrentScreen::Editing,
-                    KeyCode::Char('p') => app.table.pick(),
+                    KeyCode::Char(' ') => app.table.pick(),
                     KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
                     KeyCode::Char('j') | KeyCode::Down => app.table.next(),
                     KeyCode::Char('k') | KeyCode::Up => app.table.previous(),
+                    KeyCode::Enter => {
+                        if !app.table.picked.is_empty() {
+                            app.saved_input.clear();
+                            app.load_pick();
+                            app.curr_screen = CurrentScreen::Exiting;
+                        }
+                    }
                     _ => {}
                 },
-
                 CurrentScreen::Setting => match key.code {
                     KeyCode::Tab => app.curr_screen = CurrentScreen::Main,
                     KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
@@ -48,7 +54,16 @@ pub async fn run_app<B: Backend>(
                     InputMode::Editing => match (key.modifiers, key.code) {
                         (modifiers, KeyCode::Enter) => match modifiers {
                             KeyModifiers::CONTROL => app.push_to_table().await,
-                            KeyModifiers::NONE => app.curr_screen = CurrentScreen::Exiting,
+                            KeyModifiers::NONE => {
+                                app.clear_saved_input();
+                                match app.save_input().await {
+                                    Ok(_) => {
+                                        app.save_history()?;
+                                        app.curr_screen = CurrentScreen::Exiting
+                                    }
+                                    Err(err) => app.set_error_msg(err.to_string()),
+                                }
+                            }
                             _ => {}
                         },
                         (KeyModifiers::NONE, KeyCode::Esc) => app.input_mode = InputMode::Normal,
