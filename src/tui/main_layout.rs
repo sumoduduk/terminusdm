@@ -1,6 +1,7 @@
 mod body_tui;
 mod footer_tui;
 mod header_tui;
+mod table_layout;
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
@@ -12,11 +13,12 @@ use self::{
     body_tui::{body_comp, input_editing, popup_exit, user_settings},
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
+    table_layout::{render_scrollbar_table, render_table},
 };
 
 use super::app::{AppTui, CurrentScreen, InputMode};
 
-pub fn ui(frame: &mut Frame, app: &AppTui) {
+pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     let screen = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Fill(1), Constraint::Length(3)])
@@ -39,8 +41,8 @@ pub fn ui(frame: &mut Frame, app: &AppTui) {
     frame.render_widget(title, upper_body[1]);
 
     //lower body - table
-    let list = body_comp(app);
-    frame.render_widget(list, body_layout[1]);
+    render_table(frame, app, body_layout[1]);
+    render_scrollbar_table(frame, app, body_layout[1]);
 
     //upper body
     let input_setting_layout = Layout::default()
