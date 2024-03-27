@@ -19,6 +19,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre
             match app.curr_screen {
                 CurrentScreen::Main => match key.code {
                     KeyCode::Tab => app.curr_screen = CurrentScreen::Editing,
+                    KeyCode::Char('p') => app.table.pick(),
                     KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
                     KeyCode::Char('j') | KeyCode::Down => app.table.next(),
                     KeyCode::Char('k') | KeyCode::Up => app.table.previous(),
