@@ -5,6 +5,7 @@ use std::{
 };
 
 use eyre::{eyre, OptionExt};
+use indexmap::{IndexMap, IndexSet};
 use ron::{
     de::from_reader,
     ser::{to_string_pretty, PrettyConfig},
@@ -15,7 +16,7 @@ use crate::{DownloadStage, HistoryDownload};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Histories {
-    history: BTreeMap<u32, HistoryDownload>,
+    history: IndexMap<u32, HistoryDownload>,
 }
 
 impl Histories {
@@ -35,7 +36,7 @@ impl Histories {
                 hist
             }
             None => {
-                let map_history = BTreeMap::new();
+                let map_history = IndexMap::new();
                 Self {
                     history: map_history,
                 }
@@ -56,6 +57,14 @@ impl Histories {
         Ok(())
     }
 
+    fn get_history_by_idx(&self, num: usize) -> eyre::Result<(&u32, &HistoryDownload)> {
+        let res = self
+            .history
+            .get_index(num)
+            .ok_or_else(|| eyre!("ERROR: No history with key number: {num}"))?;
+        Ok(res)
+    }
+
     fn get_history(&self, num: u32) -> eyre::Result<&HistoryDownload> {
         let res = self
             .history
@@ -74,7 +83,7 @@ impl Histories {
     pub fn add_history(&mut self, download_history: HistoryDownload) -> u32 {
         let last = self
             .history
-            .last_key_value()
+            .last()
             .and_then(|l| Some(*l.0))
             .unwrap_or_default();
 
@@ -94,11 +103,11 @@ impl Histories {
         Ok(())
     }
 
-    fn remove_history(&mut self, num: u32) -> Option<HistoryDownload> {
-        self.history.remove(&num)
+    fn remove_history(&mut self, num: usize) -> Option<(u32, HistoryDownload)> {
+        self.history.shift_remove_index(num)
     }
 
-    pub fn list(&self) -> &BTreeMap<u32, HistoryDownload> {
+    pub fn list(&self) -> &IndexMap<u32, HistoryDownload> {
         &self.history
     }
 
