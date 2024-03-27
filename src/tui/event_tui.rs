@@ -20,6 +20,8 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre
                 CurrentScreen::Main => match key.code {
                     KeyCode::Tab => app.curr_screen = CurrentScreen::Editing,
                     KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
+                    KeyCode::Char('j') | KeyCode::Down => app.table.next(),
+                    KeyCode::Char('k') | KeyCode::Up => app.table.previous(),
                     _ => {}
                 },
 
@@ -42,7 +44,8 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre
                     InputMode::Editing => match (key.modifiers, key.code) {
                         (KeyModifiers::NONE, KeyCode::Enter) => {
                             app.save_input();
-                            app.curr_screen = CurrentScreen::Exiting
+                            //TODO
+                            // app.curr_screen = CurrentScreen::Exiting
                         }
                         (KeyModifiers::NONE, KeyCode::Esc) => app.input_mode = InputMode::Normal,
                         (KeyModifiers::NONE, KeyCode::Tab) => {
