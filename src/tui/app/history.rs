@@ -98,7 +98,7 @@ impl Histories {
         self.history.remove(&num)
     }
 
-    fn list(&self) -> &BTreeMap<u32, HistoryDownload> {
+    pub fn list(&self) -> &BTreeMap<u32, HistoryDownload> {
         &self.history
     }
 
@@ -128,6 +128,10 @@ impl Histories {
         let file_path = file_path.exists().then(|| file_path);
 
         file_path
+    }
+
+    pub fn len(&self) -> usize {
+        self.history.len()
     }
 }
 
