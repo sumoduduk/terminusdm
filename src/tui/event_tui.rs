@@ -7,7 +7,10 @@ use super::{
     main_layout::ui,
 };
 
-pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre::Result<bool> {
+pub async fn run_app<B: Backend>(
+    terminal: &mut Terminal<B>,
+    app: &mut AppTui,
+) -> eyre::Result<bool> {
     loop {
         terminal.draw(|f| ui(f, app))?;
 
@@ -43,11 +46,11 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre
                         _ => {}
                     },
                     InputMode::Editing => match (key.modifiers, key.code) {
-                        (KeyModifiers::NONE, KeyCode::Enter) => {
-                            app.save_input();
-                            //TODO
-                            // app.curr_screen = CurrentScreen::Exiting
-                        }
+                        (modifiers, KeyCode::Enter) => match modifiers {
+                            KeyModifiers::CONTROL => app.push_to_table().await,
+                            KeyModifiers::NONE => app.curr_screen = CurrentScreen::Exiting,
+                            _ => {}
+                        },
                         (KeyModifiers::NONE, KeyCode::Esc) => app.input_mode = InputMode::Normal,
                         (KeyModifiers::NONE, KeyCode::Tab) => {
                             app.input_mode = InputMode::Normal;
@@ -57,6 +60,14 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppTui) -> eyre
                             app.input_uri.handle_event(&Event::Key(key));
                         }
                     },
+                },
+
+                CurrentScreen::ErrorScreen => match key.code {
+                    KeyCode::Enter => {
+                        app.clear_error_msg();
+                        app.curr_screen = CurrentScreen::Main;
+                    }
+                    _ => {}
                 },
             }
         }
