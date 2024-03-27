@@ -15,6 +15,7 @@ pub enum CurrentScreen {
     Editing,
     Setting,
     Exiting,
+    ErrorScreen,
 }
 
 pub enum InputMode {
@@ -27,6 +28,7 @@ pub struct AppTui {
     pub input_mode: InputMode,
     pub curr_screen: CurrentScreen,
     pub saved_input: Vec<String>,
+    pub error_msg: String,
     pub history: Histories,
     pub table: Table,
 }
@@ -42,6 +44,7 @@ impl AppTui {
             saved_input: Vec::new(),
             history: histo,
             table: Table::new(len_histo),
+            error_msg: String::new(),
         }
     }
 
@@ -52,6 +55,9 @@ impl AppTui {
             file_name: input_value.to_owned(),
             url: "https:download.com/2sadw".to_owned(),
             stage_download: DownloadStage::DOWNLOADING,
+            is_resumable: false,
+            sizes: 1000,
+            total_chunk: 16,
         };
 
         self.add_history(down_histo);
@@ -77,6 +83,19 @@ impl AppTui {
         self.history.list()
     }
 
+    pub async fn push_to_table(&mut self) {
+        let uri = self.input_uri.value();
+
+        let history_download = HistoryDownload::new(uri).await;
+        match history_download {
+            Ok(history_download) => {
+                self.add_history(history_download);
+            }
+            Err(err) => self.set_error_msg(err.to_string()),
+        }
+        self.input_uri.reset();
+    }
+
     pub fn add_history(&mut self, download_history: HistoryDownload) -> u32 {
         let key = self.history.add_history(download_history);
         let len = self.history.len();
@@ -90,5 +109,14 @@ impl AppTui {
     pub fn save_history(&self) -> eyre::Result<()> {
         self.history.save_history(HISTORY_FILE_NAME)?;
         Ok(())
+    }
+
+    pub fn set_error_msg(&mut self, msg: String) {
+        self.error_msg = msg;
+        self.curr_screen = CurrentScreen::ErrorScreen;
+    }
+
+    pub fn clear_error_msg(&mut self) {
+        self.error_msg = String::new();
     }
 }
