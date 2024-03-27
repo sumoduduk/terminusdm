@@ -27,7 +27,7 @@ pub struct AppTui {
     pub input_uri: Input,
     pub input_mode: InputMode,
     pub curr_screen: CurrentScreen,
-    pub saved_input: Vec<String>,
+    pub saved_input: Vec<u32>,
     pub error_msg: String,
     pub history: Histories,
     pub table: Table,
@@ -48,29 +48,38 @@ impl AppTui {
         }
     }
 
-    pub fn save_input(&mut self) {
+    pub fn load_pick(&mut self) {
+        let indexes = &self.table.picked;
+        let nums = indexes.iter().for_each(|idx| {
+            let hist = self.history.get_history_by_idx(*idx);
+            match hist {
+                Ok((num, _)) => self.saved_input.push(*num),
+                Err(_) => (),
+            }
+        });
+
+        self.table.picked.clear();
+    }
+
+    pub async fn save_input(&mut self) -> eyre::Result<()> {
         let input_value = self.input_uri.value();
 
-        let down_histo = HistoryDownload {
-            file_name: input_value.to_owned(),
-            url: "https:download.com/2sadw".to_owned(),
-            stage_download: DownloadStage::DOWNLOADING,
-            is_resumable: false,
-            sizes: 1000,
-            total_chunk: 16,
-        };
-
-        self.add_history(down_histo);
-
-        //TODO
-        // if input_value.contains(',') {
-        //     let mut vec_str = string_to_vec(input_value);
-        //     self.saved_input.append(&mut vec_str);
-        // } else {
-        //     self.saved_input.push(input_value.into());
-        // }
+        // TODO
+        if input_value.contains(',') {
+            let vec_str = string_to_vec(input_value);
+            for uri in vec_str {
+                let histo = HistoryDownload::new(&uri).await?;
+                let num = self.add_history(histo);
+                self.saved_input.push(num);
+            }
+        } else {
+            let histo = HistoryDownload::new(input_value).await?;
+            let num = self.add_history(histo);
+            self.saved_input.push(num);
+        }
 
         self.input_uri.reset();
+        Ok(())
     }
 
     pub fn print_vec(&self) -> eyre::Result<()> {
@@ -106,6 +115,12 @@ impl AppTui {
     pub fn update_stage(&mut self, num: u32, stage: DownloadStage) {
         self.history.update_stage(num, stage);
     }
+
+    pub fn get_history(&self, num: u32) -> eyre::Result<&HistoryDownload> {
+        let res = self.history.get_history(num)?;
+        Ok(res)
+    }
+
     pub fn save_history(&self) -> eyre::Result<()> {
         self.history.save_history(HISTORY_FILE_NAME)?;
         Ok(())
@@ -118,5 +133,9 @@ impl AppTui {
 
     pub fn clear_error_msg(&mut self) {
         self.error_msg = String::new();
+    }
+
+    pub fn clear_saved_input(&mut self) {
+        self.saved_input.clear();
     }
 }
