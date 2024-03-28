@@ -7,9 +7,13 @@ use strum::{Display, EnumIter, FromRepr};
 #[derive(Default, FromRepr, EnumIter, Display, Clone, Copy)]
 pub enum SelectedTabs {
     #[default]
+    #[strum(to_string = "Folder")]
     DownloadFolder,
+    #[strum(to_string = "Concurent Download")]
     ConcurrentTotal,
+    #[strum(to_string = "Chunk")]
     ChunkSize,
+    #[strum(to_string = "Language")]
     Language,
 }
 
