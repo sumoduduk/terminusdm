@@ -38,6 +38,8 @@ pub async fn run_app<B: Backend>(
                 CurrentScreen::Setting => match key.code {
                     KeyCode::Tab => app.curr_screen = CurrentScreen::Main,
                     KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
+                    KeyCode::Char('l') | KeyCode::Right => app.next_tab(),
+                    KeyCode::Char('h') | KeyCode::Left => app.previous_tab(),
                     _ => {}
                 },
                 CurrentScreen::Exiting => match key.code {
