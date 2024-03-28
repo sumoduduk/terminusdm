@@ -1630,6 +1630,7 @@ dependencies = [
  "ron",
  "serde",
  "serde_json",
+ "strum",
  "tokio",
  "trauma",
  "tui-input",
