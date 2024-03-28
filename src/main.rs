@@ -27,7 +27,7 @@ async fn main() -> eyre::Result<()> {
             DisableMouseCapture
         )?;
         terminal.show_cursor()?;
-        // terminal.clear()?;
+        terminal.clear()?;
 
         match res {
             Ok(do_print) => {
