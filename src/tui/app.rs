@@ -1,11 +1,12 @@
 mod history;
 mod table;
+pub mod tabs_state;
 
 use crate::{utils::to_vec::string_to_vec, DownloadStage, HistoryDownload};
 use indexmap::IndexMap;
 use tui_input::Input;
 
-use self::history::Histories;
+use self::{history::Histories, tabs_state::SelectedTabs};
 use table::Table;
 
 const HISTORY_FILE_NAME: &str = "history.ron";
@@ -31,6 +32,7 @@ pub struct AppTui {
     pub error_msg: String,
     pub history: Histories,
     pub table: Table,
+    pub selected_tabs: SelectedTabs,
 }
 
 impl AppTui {
@@ -45,6 +47,7 @@ impl AppTui {
             history: histo,
             table: Table::new(len_histo),
             error_msg: String::new(),
+            selected_tabs: SelectedTabs::default(),
         }
     }
 
@@ -137,5 +140,13 @@ impl AppTui {
 
     pub fn clear_saved_input(&mut self) {
         self.saved_input.clear();
+    }
+
+    pub fn next_tab(&mut self) {
+        self.selected_tabs = self.selected_tabs.next();
+    }
+
+    pub fn previous_tab(&mut self) {
+        self.selected_tabs = self.selected_tabs.prev();
     }
 }
