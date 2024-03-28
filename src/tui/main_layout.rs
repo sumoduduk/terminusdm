@@ -6,7 +6,7 @@ mod table_layout;
 mod tabs_layout;
 
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Constraint, Direction, Layout, Margin, Rect},
     widgets::Clear,
     Frame,
 };
@@ -17,7 +17,7 @@ use self::{
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
     table_layout::{render_scrollbar_table, render_table},
-    tabs_layout::{render_tabs, render_tabs_content},
+    tabs_layout::{outer_block_setting, render_tabs, render_tabs_content},
 };
 
 use super::app::{AppTui, CurrentScreen, InputMode};
@@ -39,9 +39,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
         .split(body_layout[0]);
 
     //title
-    let title = header_comp();
 
-    frame.render_widget(title, upper_body[1]);
+    header_comp(frame, upper_body[1]);
 
     //lower body - table
     render_table(frame, app, body_layout[1]);
@@ -70,9 +69,17 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
     //setting
 
-    let tabs_layout = Layout::vertical([Constraint::Length(3), Constraint::Min(0)]);
+    let tabs_layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(2)]);
 
-    let [tabs_header, tabs_content] = tabs_layout.areas(input_setting_layout[1]);
+    let setting_inner = input_setting_layout[1].inner(&Margin {
+        vertical: 1,
+        horizontal: 1,
+    });
+
+    let [tabs_header, tabs_content] = tabs_layout.areas(setting_inner);
+
+    let setting_outer = outer_block_setting(app);
+    frame.render_widget(setting_outer, input_setting_layout[1]);
 
     render_tabs(frame, app, tabs_header);
     render_tabs_content(frame, app, tabs_content);
