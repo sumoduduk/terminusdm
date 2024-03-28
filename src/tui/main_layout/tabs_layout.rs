@@ -1,13 +1,13 @@
 use ratatui::{
-    layout::Rect,
-    style::Color,
+    layout::{Alignment, Rect},
+    style::{Color, Style},
     symbols,
-    widgets::{Block, Borders, Padding, Paragraph, Tabs},
+    widgets::{block::Title, Block, BorderType, Borders, Padding, Paragraph, Tabs},
     Frame,
 };
 use strum::IntoEnumIterator;
 
-use crate::tui::app::{tabs_state::SelectedTabs, AppTui};
+use crate::tui::app::{tabs_state::SelectedTabs, AppTui, CurrentScreen};
 
 pub fn render_tabs(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let title_tab = SelectedTabs::iter().map(SelectedTabs::title);
@@ -44,10 +44,27 @@ fn render_tab3(app: &AppTui) -> Paragraph<'static> {
 /// A block surrounding the tab's content
 fn block(app: &AppTui) -> Block<'static> {
     Block::default()
+        .title(
+            Title::from("◄ ► to change tab | Press e to edit | Enter to confirm")
+                .alignment(Alignment::Right),
+        )
         .borders(Borders::ALL)
-        .border_set(symbols::border::PROPORTIONAL_TALL)
         .padding(Padding::horizontal(1))
         .border_style(app.selected_tabs.palette().c700)
+}
+
+pub fn outer_block_setting(app: &AppTui) -> Block<'static> {
+    Block::default()
+        .borders(Borders::ALL)
+        .title("Config")
+        .border_type(match app.curr_screen {
+            CurrentScreen::Setting => BorderType::Thick,
+            _ => BorderType::Rounded,
+        })
+        .border_style(match app.curr_screen {
+            CurrentScreen::Setting => Style::default().fg(Color::Cyan),
+            _ => Style::default(),
+        })
 }
 
 pub fn render_tabs_content(frame: &mut Frame, app: &AppTui, area: Rect) {
