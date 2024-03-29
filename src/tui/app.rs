@@ -2,7 +2,11 @@ mod history;
 mod table;
 pub mod tabs_state;
 
-use crate::{utils::to_vec::string_to_vec, DownloadStage, HistoryDownload};
+use crate::{
+    config::{self, Config},
+    utils::to_vec::string_to_vec,
+    DownloadStage, HistoryDownload,
+};
 use indexmap::IndexMap;
 use tui_input::Input;
 
@@ -33,12 +37,14 @@ pub struct AppTui {
     pub history: Histories,
     pub table: Table,
     pub selected_tabs: SelectedTabs,
+    pub setting: Config,
 }
 
 impl AppTui {
-    pub fn new() -> Self {
+    pub fn new(config_setting: Config) -> Self {
         let histo = Histories::new(HISTORY_FILE_NAME);
         let len_histo = histo.len();
+
         Self {
             input_uri: Input::default(),
             input_mode: InputMode::Normal,
@@ -48,6 +54,17 @@ impl AppTui {
             table: Table::new(len_histo),
             error_msg: String::new(),
             selected_tabs: SelectedTabs::default(),
+            setting: config_setting,
+        }
+    }
+
+    pub fn tabs_content(&self) -> Input {
+        let config = &self.setting;
+        match self.selected_tabs {
+            SelectedTabs::DownloadFolder => Input::new(config.default_folder.display().to_string()),
+            SelectedTabs::ConcurrentTotal => Input::new(config.concurrent_download.to_string()),
+            SelectedTabs::ChunkSize => Input::new(config.minimum_size.to_string()),
+            SelectedTabs::Language => Input::new("Language".to_string()),
         }
     }
 
