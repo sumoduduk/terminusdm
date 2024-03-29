@@ -48,8 +48,7 @@ fn block(app: &AppTui) -> Block<'static> {
             Title::from("◄ ► to change tab | Press e to edit | Enter to confirm")
                 .alignment(Alignment::Right),
         )
-        .borders(Borders::ALL)
-        .padding(Padding::horizontal(1))
+        .borders(Borders::TOP)
         .border_style(app.selected_tabs.palette().c700)
 }
 
