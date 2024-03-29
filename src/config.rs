@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use strum::Display;
 
 #[derive(Serialize, Deserialize, Debug, Display)]
-enum Language {
+pub enum Language {
     #[strum(to_string = "English")]
     English,
     #[strum(to_string = "Indonesia")]
@@ -20,12 +20,12 @@ enum Language {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Config {
-    default_folder: PathBuf,
-    concurrent_download: usize,
-    total_chunk: u64,
-    language: Language,
-    minimum_size: u64,
+pub struct Config {
+    pub default_folder: PathBuf,
+    pub concurrent_download: usize,
+    pub total_chunk: u64,
+    pub language: Language,
+    pub minimum_size: u64,
 }
 
 impl Config {
