@@ -30,7 +30,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
     let body_layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(25), Constraint::Percentage(75)])
+        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
         .split(screen[0]);
 
     let upper_body = Layout::default()
