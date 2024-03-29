@@ -3,7 +3,7 @@ mod table;
 pub mod tabs_state;
 
 use crate::{
-    config::{self, Config},
+    config::{self, Config, Language},
     utils::to_vec::string_to_vec,
     DownloadStage, HistoryDownload,
 };
@@ -38,6 +38,8 @@ pub struct AppTui {
     pub table: Table,
     pub selected_tabs: SelectedTabs,
     pub setting: Config,
+    pub tab_content_input: Input,
+    pub tab_content_mode: InputMode,
 }
 
 impl AppTui {
@@ -55,17 +57,30 @@ impl AppTui {
             error_msg: String::new(),
             selected_tabs: SelectedTabs::default(),
             setting: config_setting,
+            tab_content_input: Input::default(),
+            tab_content_mode: InputMode::Normal,
         }
     }
 
-    pub fn tabs_content(&self) -> Input {
-        let config = &self.setting;
+    pub fn update_config(&mut self, input_str: &str, lang: Option<Language>) -> eyre::Result<()> {
         match self.selected_tabs {
-            SelectedTabs::DownloadFolder => Input::new(config.default_folder.display().to_string()),
-            SelectedTabs::ConcurrentTotal => Input::new(config.concurrent_download.to_string()),
-            SelectedTabs::ChunkSize => Input::new(config.minimum_size.to_string()),
-            SelectedTabs::Language => Input::new("Language".to_string()),
+            SelectedTabs::DownloadFolder => {
+                self.setting.update_default_folder(input_str)?;
+            }
+            SelectedTabs::ConcurrentTotal => {
+                self.setting.update_concurrent_download(input_str)?;
+            }
+            SelectedTabs::ChunkSize => {
+                self.setting.update_chunk_size(input_str)?;
+            }
+            SelectedTabs::Language => {
+                if let Some(lang) = lang {
+                    self.setting.change_languange(lang);
+                }
+            }
         }
+
+        Ok(())
     }
 
     pub fn load_pick(&mut self) {
