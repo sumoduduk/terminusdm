@@ -99,8 +99,10 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
     let is_resumable = &history.is_resumable;
 
+    //todo - load from config
     let dir_home = dirs::home_dir().ok_or_eyre("ERROR: failed to get home dir")?;
     let download_path = dir_home.join("Downloads").join("tdm");
+
     if !is_resumable {
         let downloder = vec![Download::try_from(url)?];
         let build = DownloaderBuilder::new()
