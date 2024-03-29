@@ -9,6 +9,8 @@ use super::{
     main_layout::ui,
 };
 
+use event_tab::handle_tabs_event;
+
 pub async fn run_app<B: Backend>(
     terminal: &mut Terminal<B>,
     app: &mut AppTui,
@@ -37,13 +39,9 @@ pub async fn run_app<B: Backend>(
                     }
                     _ => {}
                 },
-                CurrentScreen::Setting => match key.code {
-                    KeyCode::Tab => app.curr_screen = CurrentScreen::Main,
-                    KeyCode::Char('q') => app.curr_screen = CurrentScreen::Exiting,
-                    KeyCode::Char('l') | KeyCode::Right => app.next_tab(),
-                    KeyCode::Char('h') | KeyCode::Left => app.previous_tab(),
-                    _ => {}
-                },
+                CurrentScreen::Setting => {
+                    handle_tabs_event(app, key);
+                }
                 CurrentScreen::Exiting => match key.code {
                     KeyCode::Char('y') => return Ok(true),
                     KeyCode::Char('n') | KeyCode::Char('q') => return Ok(false),
