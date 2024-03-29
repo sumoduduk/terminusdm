@@ -1,4 +1,5 @@
 mod begin_download;
+mod config;
 mod merge_file;
 mod req_lib;
 pub mod tui;
