@@ -39,7 +39,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
         .split(body_layout[0]);
 
     //title
-
     header_comp(frame, upper_body[1]);
 
     //lower body - table
@@ -68,9 +67,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     }
 
     //setting
-
-    let tabs_layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(2)]);
-
+    let tabs_layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(0)]);
     let setting_inner = input_setting_layout[1].inner(&Margin {
         vertical: 1,
         horizontal: 1,
