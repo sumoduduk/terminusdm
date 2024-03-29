@@ -7,6 +7,8 @@ use crossterm::{
 };
 use ratatui::{backend::CrosstermBackend, Terminal};
 
+const CONFIG_FILENAME: &str = "tdm_config.ron";
+
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
     loop {
@@ -16,7 +18,9 @@ async fn main() -> eyre::Result<()> {
         execute!(stderr, EnterAlternateScreen, EnableMouseCapture)?;
 
         let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
-        let mut app = tdm::tui::app::AppTui::new();
+
+        let config = tdm::config::Config::new(CONFIG_FILENAME);
+        let mut app = tdm::tui::app::AppTui::new(config);
 
         let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app).await;
 
