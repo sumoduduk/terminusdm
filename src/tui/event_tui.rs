@@ -1,3 +1,5 @@
+mod event_tab;
+
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use ratatui::{backend::Backend, Terminal};
 use tui_input::backend::crossterm::EventHandler;
@@ -65,6 +67,7 @@ pub async fn run_app<B: Backend>(
                                     }
                                     Err(err) => app.set_error_msg(err.to_string()),
                                 }
+                                app.input_mode = InputMode::Normal;
                             }
                             _ => {}
                         },
