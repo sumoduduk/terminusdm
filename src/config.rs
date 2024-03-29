@@ -19,6 +19,8 @@ pub enum Language {
     Indonesia,
 }
 
+const CONFIG_FILENAME: &str = "tdm_config.ron";
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub default_folder: PathBuf,
@@ -29,12 +31,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(config_filename: &str) -> Self {
+    pub fn new() -> Self {
         let path_folder = Self::check_config_folder()
             .map_err(|err| println!("ERR : {err}"))
             .unwrap();
 
-        let config = match Self::check_config_file(path_folder, config_filename) {
+        let config = match Self::check_config_file(path_folder, CONFIG_FILENAME) {
             Some(file_config) => {
                 let file_path =
                     File::open(file_config).expect("ERROR : Error while open config folder");
@@ -57,7 +59,7 @@ impl Config {
                     minimum_size: 2048,
                 };
 
-                Self::create_config(&default_config, config_filename)
+                Self::create_config(&default_config, CONFIG_FILENAME)
                     .expect("Error: create config file");
                 default_config
             }
@@ -66,7 +68,7 @@ impl Config {
         config
     }
 
-    fn update_default_folder(&mut self, path_str: &str) -> eyre::Result<()> {
+    pub fn update_default_folder(&mut self, path_str: &str) -> eyre::Result<()> {
         let path = PathBuf::from(path_str);
 
         if !path.exists() {
@@ -78,28 +80,28 @@ impl Config {
         Ok(())
     }
 
-    fn update_concurrent_download(&mut self, amount: &str) -> eyre::Result<()> {
+    pub fn update_concurrent_download(&mut self, amount: &str) -> eyre::Result<()> {
         let num = amount.parse::<usize>()?;
         self.concurrent_download = num;
 
         Ok(())
     }
 
-    fn update_chunk_size(&mut self, amount: &str) -> eyre::Result<()> {
+    pub fn update_chunk_size(&mut self, amount: &str) -> eyre::Result<()> {
         let chunk_size = amount.parse::<u64>()?;
         self.total_chunk = chunk_size;
 
         Ok(())
     }
 
-    fn update_min_size(&mut self, amount: &str) -> eyre::Result<()> {
+    pub fn update_min_size(&mut self, amount: &str) -> eyre::Result<()> {
         let min_size = amount.parse::<u64>()?;
         self.minimum_size = min_size;
 
         Ok(())
     }
 
-    fn change_languange(&mut self, lang: Language) {
+    pub fn change_languange(&mut self, lang: Language) {
         self.language = lang
     }
 
@@ -113,7 +115,12 @@ impl Config {
         Ok(())
     }
 
-    pub fn save_history(&self, history_filename: &str) -> eyre::Result<()> {
+    pub fn save_history(&self) -> eyre::Result<()> {
+        self.save_inner_history(CONFIG_FILENAME)?;
+        Ok(())
+    }
+
+    fn save_inner_history(&self, history_filename: &str) -> eyre::Result<()> {
         let file_path = Self::get_file_history(history_filename)?;
         let pretty_config = PrettyConfig::new().depth_limit(4).enumerate_arrays(true);
         let pretty_str = to_string_pretty(self, pretty_config)?;

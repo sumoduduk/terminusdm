@@ -7,8 +7,6 @@ use crossterm::{
 };
 use ratatui::{backend::CrosstermBackend, Terminal};
 
-const CONFIG_FILENAME: &str = "tdm_config.ron";
-
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
     loop {
@@ -19,7 +17,7 @@ async fn main() -> eyre::Result<()> {
 
         let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
 
-        let config = tdm::config::Config::new(CONFIG_FILENAME);
+        let config = tdm::config::Config::new();
         let mut app = tdm::tui::app::AppTui::new(config);
 
         let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app).await;
