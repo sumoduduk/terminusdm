@@ -8,6 +8,7 @@ use crate::{
     DownloadStage, HistoryDownload,
 };
 use indexmap::IndexMap;
+use ratatui::widgets::ListState;
 use tui_input::Input;
 
 use self::{history::Histories, tabs_state::SelectedTabs};
@@ -40,6 +41,7 @@ pub struct AppTui {
     pub setting: Config,
     pub tab_content_input: Input,
     pub tab_content_mode: InputMode,
+    pub lang_state: ListState,
 }
 
 impl AppTui {
@@ -59,7 +61,36 @@ impl AppTui {
             setting: config_setting,
             tab_content_input: Input::default(),
             tab_content_mode: InputMode::Normal,
+            lang_state: ListState::default(),
         }
+    }
+
+    pub fn next_lang(&mut self) {
+        let i = match self.lang_state.selected() {
+            Some(i) => {
+                if i >= 2 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.lang_state.select(Some(i));
+    }
+
+    pub fn prev_lang(&mut self) {
+        let i = match self.lang_state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0, // self.last_selected.unwrap_or(0),
+        };
+        self.lang_state.select(Some(i));
     }
 
     pub fn update_config(&mut self, input_str: &str, lang: Option<Language>) -> eyre::Result<()> {
@@ -79,7 +110,7 @@ impl AppTui {
                 }
             }
         }
-
+        self.setting.save_history();
         Ok(())
     }
 
