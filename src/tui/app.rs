@@ -46,6 +46,7 @@ pub struct AppTui {
 
 impl AppTui {
     pub fn new(config_setting: Config) -> Self {
+        let chunk = &config_setting.total_chunk;
         let histo = Histories::new(HISTORY_FILE_NAME);
         let len_histo = histo.len();
 
@@ -104,6 +105,9 @@ impl AppTui {
             SelectedTabs::ChunkSize => {
                 self.setting.update_chunk_size(input_str)?;
             }
+            SelectedTabs::MinimunSize => {
+                self.setting.update_min_size(input_str)?;
+            }
             SelectedTabs::Language => {
                 if let Some(lang) = lang {
                     self.setting.change_languange(lang);
@@ -129,17 +133,18 @@ impl AppTui {
 
     pub async fn save_input(&mut self) -> eyre::Result<()> {
         let input_value = self.input_uri.value();
+        let chunks = self.setting.total_chunk;
 
         // TODO
         if input_value.contains(',') {
             let vec_str = string_to_vec(input_value);
             for uri in vec_str {
-                let histo = HistoryDownload::new(&uri).await?;
+                let histo = HistoryDownload::new(&uri, chunks).await?;
                 let num = self.add_history(histo);
                 self.saved_input.push(num);
             }
         } else {
-            let histo = HistoryDownload::new(input_value).await?;
+            let histo = HistoryDownload::new(input_value, chunks).await?;
             let num = self.add_history(histo);
             self.saved_input.push(num);
         }
@@ -160,8 +165,9 @@ impl AppTui {
 
     pub async fn push_to_table(&mut self) {
         let uri = self.input_uri.value();
+        let chunks = self.setting.total_chunk;
 
-        let history_download = HistoryDownload::new(uri).await;
+        let history_download = HistoryDownload::new(uri, chunks).await;
         match history_download {
             Ok(history_download) => {
                 self.add_history(history_download);
