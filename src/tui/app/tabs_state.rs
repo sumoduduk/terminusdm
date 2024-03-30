@@ -13,6 +13,8 @@ pub enum SelectedTabs {
     ConcurrentTotal,
     #[strum(to_string = "Chunk")]
     ChunkSize,
+    #[strum(to_string = "Minimum Size")]
+    MinimunSize,
     #[strum(to_string = "Language")]
     Language,
 }
@@ -44,6 +46,7 @@ impl SelectedTabs {
             Self::DownloadFolder => tailwind::BLUE,
             Self::ConcurrentTotal => tailwind::EMERALD,
             Self::ChunkSize => tailwind::INDIGO,
+            Self::MinimunSize => tailwind::YELLOW,
             Self::Language => tailwind::RED,
         }
     }
