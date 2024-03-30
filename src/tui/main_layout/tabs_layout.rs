@@ -80,6 +80,18 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 
             render_value_input(app, frame, input_layout);
         }
+        SelectedTabs::MinimunSize => {
+            let mininimum_size = config.minimum_size.to_string();
+            span_content(
+                "Minimum Download File Size For Concurrent Download",
+                &mininimum_size,
+                content_layout,
+                frame,
+                app,
+            );
+
+            render_value_input(app, frame, input_layout);
+        }
         _ => {
             let index = match lang {
                 Language::English => 0,
@@ -130,7 +142,7 @@ fn span_content(key: &str, val: &str, area: Rect, frame: &mut Frame, app: &AppTu
     frame.render_widget(left_key, left_side);
     let right_val = Line::from(val)
         .centered()
-        .style(Style::default().bg(app.selected_tabs.palette().c500));
+        .style(Style::default().bg(app.selected_tabs.palette().c800));
 
     frame.render_widget(right_val, right_side);
 }
