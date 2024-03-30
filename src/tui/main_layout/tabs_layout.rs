@@ -1,3 +1,5 @@
+mod lang_layout;
+
 use ratatui::{
     layout::{Alignment, Constraint, Layout, Margin, Rect},
     style::{Color, Style},
@@ -10,6 +12,8 @@ use strum::IntoEnumIterator;
 
 use crate::tui::app::{tabs_state::SelectedTabs, AppTui, CurrentScreen};
 use crate::{config::Language, tui::app::InputMode::*};
+
+use self::lang_layout::render_lang_layout;
 
 pub fn render_tabs(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let title_tab = SelectedTabs::iter().map(SelectedTabs::title);
@@ -27,7 +31,7 @@ pub fn render_tabs(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     frame.render_widget(tabs_header, area)
 }
 
-pub fn render_tabs_content(frame: &mut Frame, app: &AppTui, area: Rect) {
+pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let block_content = block(app);
     frame.render_widget(block_content, area);
     let inside_area = area.inner(&Margin {
@@ -43,6 +47,7 @@ pub fn render_tabs_content(frame: &mut Frame, app: &AppTui, area: Rect) {
     let [_, content_layout, input_layout] = inside_rect.areas(inside_area);
 
     let config = &app.setting;
+    let lang = &config.language;
 
     match app.selected_tabs {
         SelectedTabs::DownloadFolder => {
@@ -75,7 +80,13 @@ pub fn render_tabs_content(frame: &mut Frame, app: &AppTui, area: Rect) {
 
             render_value_input(app, frame, input_layout);
         }
-        _ => {}
+        _ => {
+            let index = match lang {
+                Language::English => 0,
+                Language::Indonesia => 1,
+            };
+            render_lang_layout(frame, app, inside_area, index);
+        }
     };
 }
 
@@ -139,9 +150,14 @@ pub fn outer_block_setting(app: &AppTui) -> Block<'static> {
 }
 
 fn block(app: &AppTui) -> Block<'static> {
-    let title_tab_content = match app.tab_content_mode {
-        Normal => "◄ ► to change tab | Press e to edit ",
-        Editing => "Press Esc to cancel | Enter to confirm",
+    let title_tab_content = match app.selected_tabs {
+        SelectedTabs::Language => {
+            "◄ ► to change tab | ▲ ▼  to change language | Press Enter to confirm"
+        }
+        _ => match app.tab_content_mode {
+            Normal => "◄ ► to change tab | Press e to edit ",
+            Editing => "Press Esc to cancel | Enter to confirm",
+        },
     };
 
     Block::default()
