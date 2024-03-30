@@ -7,6 +7,7 @@ pub async fn start_download(
     temp: PathBuf,
     uri: &Url,
     range_header: &[(u64, u64)],
+    num_concur: usize,
 ) -> eyre::Result<Vec<Summary>> {
     tokio::fs::create_dir_all(&temp).await?;
 
@@ -19,7 +20,7 @@ pub async fn start_download(
 
     let begin = DownloaderBuilder::new()
         .directory(temp)
-        .concurrent_downloads(4)
+        .concurrent_downloads(num_concur)
         .build();
 
     let summary = begin.download(&batch_dl).await;
@@ -67,7 +68,7 @@ mod tests {
             create_range(sizes, divisor).ok_or_eyre("Error: divisor should be non-zero")?;
         let out_file = "output.zip";
 
-        let summary = start_download(temp.clone(), uri, &ranges).await;
+        let summary = start_download(temp.clone(), uri, &ranges, 4).await;
         assert!(summary.is_ok());
 
         let res = merge(&temp, divisor as usize, &temp, out_file).await;

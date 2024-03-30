@@ -48,7 +48,7 @@ pub struct HistoryDownload {
 
 //need fix
 impl HistoryDownload {
-    async fn new(uri: &str) -> eyre::Result<Self> {
+    async fn new(uri: &str, total_chunk: u64) -> eyre::Result<Self> {
         let header_obj = HeaderObject::new(uri).await?;
         let is_resumable = header_obj.is_ranges()?;
         let file_name = header_obj
@@ -95,15 +95,19 @@ impl HistoryDownload {
 pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
     let history = app.get_history(key)?.clone();
     let url = history.url();
-    println!("Begin Download : {url}");
-
     let is_resumable = &history.is_resumable;
+    println!("Begin Download : {url}");
 
     //todo - load from config
     let dir_home = dirs::home_dir().ok_or_eyre("ERROR: failed to get home dir")?;
     let download_path = dir_home.join("Downloads").join("tdm");
 
-    if !is_resumable {
+    let size_min = &app.setting.minimum_size;
+    let total_chunk = &history.total_chunk;
+
+    let is_minimun = size_min > total_chunk;
+
+    if !is_resumable || is_minimun {
         let downloder = vec![Download::try_from(url)?];
         let build = DownloaderBuilder::new()
             .directory(download_path.clone())
@@ -112,8 +116,8 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
     } else {
         let file_name = &history.file_name;
         let sizes = &history.sizes;
-        let total_chunk = &history.total_chunk;
         let url = Url::parse(url)?;
+        let number_concurrent = app.setting.concurrent_download;
 
         let ranges =
             create_range(*sizes, *total_chunk).ok_or_eyre("Error: divisor should be non-zero")?;
@@ -122,7 +126,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
         app.update_stage(key, DownloadStage::DOWNLOADING);
         app.save_history();
-        let res = start_download(temp.clone(), &url, &ranges).await;
+        let res = start_download(temp.clone(), &url, &ranges, number_concurrent).await;
 
         if let Ok(_) = res {
             app.update_stage(key, DownloadStage::MERGING);
