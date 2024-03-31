@@ -55,7 +55,7 @@ mod tests {
         let temp = download_dirs.join("temp");
 
         let header_obj = HeaderObject::new(&URI).await?;
-        if !header_obj.is_ranges()? {
+        if !header_obj.is_ranges() {
             return Err(eyre!("Not Resumable"));
         }
         let uri = header_obj.get_url();
