@@ -21,6 +21,8 @@ pub enum CurrentScreen {
     Editing,
     Setting,
     Exiting,
+    PrepareDownload,
+    Download,
     ErrorScreen,
 }
 
@@ -33,7 +35,7 @@ pub struct AppTui {
     pub input_uri: Input,
     pub input_mode: InputMode,
     pub curr_screen: CurrentScreen,
-    pub saved_input: Vec<u32>,
+    pub saved_input: Vec<(u32, String)>,
     pub error_msg: String,
     pub history: Histories,
     pub table: Table,
@@ -123,7 +125,11 @@ impl AppTui {
         let nums = indexes.iter().for_each(|idx| {
             let hist = self.history.get_history_by_idx(*idx);
             match hist {
-                Ok((num, _)) => self.saved_input.push(*num),
+                Ok((num, hist)) => {
+                    let url = hist.url();
+
+                    self.saved_input.push((*num, url.to_string()))
+                }
                 Err(_) => (),
             }
         });
@@ -132,21 +138,22 @@ impl AppTui {
     }
 
     pub async fn save_input(&mut self) -> eyre::Result<()> {
-        let input_value = self.input_uri.value();
+        let input_value = self.input_uri.clone();
+        let input_value = input_value.value();
         let chunks = self.setting.total_chunk;
 
         // TODO
         if input_value.contains(',') {
             let vec_str = string_to_vec(input_value);
-            for uri in vec_str {
-                let histo = HistoryDownload::new(&uri, chunks).await?;
+            for uri in &vec_str {
+                let histo = HistoryDownload::new(uri, chunks).await?;
                 let num = self.add_history(histo);
-                self.saved_input.push(num);
+                self.saved_input.push((num, uri.to_string()));
             }
         } else {
             let histo = HistoryDownload::new(input_value, chunks).await?;
             let num = self.add_history(histo);
-            self.saved_input.push(num);
+            self.saved_input.push((num, input_value.to_string()));
         }
 
         self.input_uri.reset();
