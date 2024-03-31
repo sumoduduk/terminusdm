@@ -1,4 +1,5 @@
 mod body_tui;
+mod download_popup;
 mod error_popup;
 mod footer_tui;
 mod header_tui;
@@ -12,7 +13,8 @@ use ratatui::{
 };
 
 use self::{
-    body_tui::{body_comp, input_editing, popup_exit, user_settings},
+    body_tui::{input_editing, popup_exit, user_settings},
+    download_popup::{render_begin_download, render_download_popup},
     error_popup::popup_error,
     footer_tui::{footer_comp_mode, footer_comp_notes},
     header_tui::header_comp,
@@ -48,7 +50,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     //upper body
     let input_setting_layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Length(3), Constraint::Fill(1)])
+        .constraints([Constraint::Length(4), Constraint::Fill(1)])
         .split(upper_body[0]);
 
     let width = input_setting_layout[0].width.max(3) - 3;
@@ -100,6 +102,18 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
         let area = centered_rect(60, 25, frame.size());
         frame.render_widget(error_widget, area);
+    }
+
+    if let CurrentScreen::Download = app.curr_screen {
+        frame.render_widget(Clear, frame.size());
+        let area = centered_rect(60, 25, frame.size());
+        render_download_popup(frame, app, area);
+    }
+
+    if let CurrentScreen::PrepareDownload = app.curr_screen {
+        frame.render_widget(Clear, frame.size());
+        let area = centered_rect(60, 25, frame.size());
+        render_begin_download(frame, app, area);
     }
 
     if let CurrentScreen::Exiting = app.curr_screen {
