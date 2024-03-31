@@ -50,7 +50,7 @@ pub struct HistoryDownload {
 impl HistoryDownload {
     async fn new(uri: &str, total_chunk: u64) -> eyre::Result<Self> {
         let header_obj = HeaderObject::new(uri).await?;
-        let is_resumable = header_obj.is_ranges()?;
+        let is_resumable = header_obj.is_ranges();
         let file_name = header_obj
             .get_filename()
             .ok_or_eyre("Error: Can't get file_name")?;
@@ -103,9 +103,8 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
     let download_path = dir_home.join("Downloads").join("tdm");
 
     let size_min = &app.setting.minimum_size;
-    let total_chunk = &history.total_chunk;
-
-    let is_minimun = size_min > total_chunk;
+    let sizes = &history.sizes;
+    let is_minimun = size_min > sizes;
 
     if !is_resumable || is_minimun {
         let downloder = vec![Download::try_from(url)?];
@@ -113,9 +112,11 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
             .directory(download_path.clone())
             .build();
         build.download(&downloder).await;
+        app.update_stage(key, DownloadStage::COMPLETE);
+        app.save_history();
     } else {
         let file_name = &history.file_name;
-        let sizes = &history.sizes;
+        let total_chunk = &history.total_chunk;
         let url = Url::parse(url)?;
         let number_concurrent = app.setting.concurrent_download;
 
