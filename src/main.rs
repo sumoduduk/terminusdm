@@ -38,7 +38,7 @@ async fn main() -> eyre::Result<()> {
                     if vec_value.is_empty() {
                         println!("empty");
                     } else {
-                        for key_value in vec_value {
+                        for (key_value, _) in vec_value {
                             let histo = app.get_history(*key_value);
                             tdm::download_chunk(&mut app, *key_value).await?;
                         }
