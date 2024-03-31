@@ -2,10 +2,12 @@ use ratatui::{
     layout::Rect,
     style::{Color, Style},
     symbols,
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, BorderType, Borders, Padding, Paragraph},
     Frame,
 };
+
+const VERSION: &str = "1.0.0";
 
 pub fn header_comp(frame: &mut Frame, area: Rect) {
     let width = area.width;
@@ -15,7 +17,10 @@ pub fn header_comp(frame: &mut Frame, area: Rect) {
         _ => "TDM",
     };
 
-    let title_block = Paragraph::new(format!("[ {} {} ] ", title_content, symbols::DOT))
+    let title = Line::from(format!("[ {} ]", title_content));
+    let version = Line::from(format!("[ v{}{} ] ", symbols::DOT, VERSION));
+
+    let title_block = Paragraph::new(vec![title, version])
         .block(title_outer_block())
         .centered()
         .style(Style::default().fg(Color::Blue));
