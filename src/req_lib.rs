@@ -18,19 +18,25 @@ impl HeaderObject {
         })
     }
 
+    //todo: size should be option
     pub fn get_sizes(&self) -> eyre::Result<u64> {
         let sizes = self.header.get(CONTENT_LENGTH).ok_or_eyre("Size Unknown")?;
         let size_num = sizes.to_str()?.parse::<u64>()?;
         Ok(size_num)
     }
 
-    pub fn is_ranges(&self) -> eyre::Result<bool> {
-        let accpe_ranges = match self.header.get(ACCEPT_RANGES) {
-            None => Err(eyre!("Not Resumable")),
-            Some(x) if x == "none" => Err(eyre!("Not Resumable")),
-            Some(_) => Ok(true),
+    pub fn is_ranges(&self) -> bool {
+        let accept_range = match self.header.get(ACCEPT_RANGES) {
+            Some(x) => {
+                if x == "none" {
+                    false
+                } else {
+                    true
+                }
+            }
+            None => false,
         };
-        accpe_ranges
+        accept_range
     }
 
     pub fn get_filename(&self) -> Option<String> {
