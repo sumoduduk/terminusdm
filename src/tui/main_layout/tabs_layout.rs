@@ -40,9 +40,9 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     });
 
     let inside_rect = Layout::vertical([
-        Constraint::Length(1),
-        Constraint::Length(1),
         Constraint::Fill(1),
+        Constraint::Length(1),
+        Constraint::Length(3),
     ]);
     let [_, content_layout, input_layout] = inside_rect.areas(inside_area);
 
