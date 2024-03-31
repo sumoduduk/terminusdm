@@ -12,6 +12,12 @@ pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
         CurrentScreen::Editing => Span::styled("Editing Mode", Style::default().fg(Color::Yellow)),
         CurrentScreen::Setting => Span::styled("Setting Mode", Style::default().fg(Color::Blue)),
         CurrentScreen::Exiting => Span::styled("Exiting", Style::default().fg(Color::LightRed)),
+        CurrentScreen::PrepareDownload => {
+            Span::styled("Prepare Download", Style::default().fg(Color::LightRed))
+        }
+        CurrentScreen::Download => {
+            Span::styled("Download Mode", Style::default().fg(Color::LightRed))
+        }
         CurrentScreen::ErrorScreen => {
             Span::styled("ERROR MESSAGE", Style::default().fg(Color::LightRed))
         }
