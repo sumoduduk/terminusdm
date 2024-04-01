@@ -64,7 +64,8 @@ pub async fn run_app<B: Backend>(
                         _ => {}
                     },
                     CurrentScreen::Exiting => match key.code {
-                        KeyCode::Char('n') | KeyCode::Char('q') => return Ok(false),
+                        KeyCode::Char('y') => return Ok(false),
+                        KeyCode::Char('n') => app.curr_screen = CurrentScreen::Main,
                         _ => (),
                     },
                     CurrentScreen::Editing => match key.code {
