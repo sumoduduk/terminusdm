@@ -1,3 +1,5 @@
+mod text_footer;
+
 use ratatui::{
     style::{Color, Style},
     text::{Line, Span},
@@ -6,11 +8,16 @@ use ratatui::{
 
 use crate::tui::app::{AppTui, CurrentScreen};
 
+use self::text_footer::TextFooter;
+
 pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
+    let language = &app.setting.language;
+    let span_editing = TextFooter::SpanEditing;
+
     let cur_span = match app.curr_screen {
         CurrentScreen::Main => Span::styled("Table Mode", Style::default().fg(Color::Green)),
         CurrentScreen::Editing => {
-            Span::styled("Enter URL Mode", Style::default().fg(Color::Yellow))
+            Span::styled("Input URL Mode", Style::default().fg(Color::Yellow))
         }
         CurrentScreen::Setting => Span::styled("Setting Mode", Style::default().fg(Color::Blue)),
         CurrentScreen::Exiting => Span::styled("Exiting", Style::default().fg(Color::LightRed)),
@@ -29,7 +36,7 @@ pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
 
     let is_editing_span = match app.curr_screen {
         CurrentScreen::Main => Span::styled(
-            "Press ENTER to Re-Download",
+            span_editing.load_text(language),
             Style::default().fg(Color::Green),
         ),
         _ => Span::styled(" ", Style::default().fg(Color::LightGreen)),
@@ -44,21 +51,30 @@ pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
 }
 
 pub fn footer_comp_notes(app: &AppTui) -> Paragraph<'static> {
+    let language = &app.setting.language;
+    let main_note = TextFooter::NoteMain;
+    let edit_note = TextFooter::NoteEditing;
+    let set_note = TextFooter::NoteSetting;
+    let base_note = TextFooter::NoteBase;
+
     let current_keys_hint = {
         match app.curr_screen {
             CurrentScreen::Main => Span::styled(
-                "(q) to quit/Tab to switch/Space to select URL",
+                main_note.load_text(language),
                 Style::default().fg(Color::LightRed),
             ),
             CurrentScreen::Editing => Span::styled(
-                "(ESC) to cancel/(Tab) to switch boxes/ Enter to complete",
+                edit_note.load_text(language),
                 Style::default().fg(Color::LightBlue),
             ),
             CurrentScreen::Setting => Span::styled(
-                "(q) to quit/(Tab) to switch boxes",
+                set_note.load_text(language),
                 Style::default().fg(Color::LightBlue),
             ),
-            _ => Span::styled("(q) to quit", Style::default().fg(Color::LightGreen)),
+            _ => Span::styled(
+                base_note.load_text(language),
+                Style::default().fg(Color::LightGreen),
+            ),
         }
     };
 
