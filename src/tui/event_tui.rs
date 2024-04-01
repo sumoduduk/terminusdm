@@ -23,7 +23,6 @@ pub async fn run_app<B: Backend>(
                 if key.kind == event::KeyEventKind::Release {
                     continue;
                 }
-
                 match app.curr_screen {
                     CurrentScreen::Main => match key.code {
                         KeyCode::Tab => app.curr_screen = CurrentScreen::Editing,
@@ -43,12 +42,20 @@ pub async fn run_app<B: Backend>(
                     CurrentScreen::Setting => {
                         handle_tabs_event(app, key);
                     }
-                    CurrentScreen::PrepareDownload => match app.save_input().await {
-                        Ok(_) => {
-                            app.save_history()?;
-                            app.curr_screen = CurrentScreen::Download
-                        }
-                        Err(err) => app.set_error_msg(err.to_string()),
+                    CurrentScreen::PrepareDownload => match key.code {
+                        KeyCode::Char('n') => app.curr_screen = CurrentScreen::Main,
+                        KeyCode::Enter | KeyCode::Char('y') => match app.save_input().await {
+                            Ok(_) => {
+                                app.save_history()?;
+                                return Ok(true);
+                                app.input_uri.reset();
+                            }
+                            Err(err) => {
+                                app.set_error_msg(err.to_string());
+                                app.input_uri.reset();
+                            }
+                        },
+                        _ => {}
                     },
                     CurrentScreen::Download => match key.code {
                         KeyCode::Char('y') | KeyCode::Enter => return Ok(true),
@@ -70,9 +77,11 @@ pub async fn run_app<B: Backend>(
                             (modifiers, KeyCode::Enter) => match modifiers {
                                 KeyModifiers::CONTROL => app.push_to_table().await,
                                 KeyModifiers::NONE => {
-                                    app.clear_saved_input();
-                                    app.input_mode = InputMode::Normal;
-                                    app.curr_screen = CurrentScreen::PrepareDownload;
+                                    if app.input_uri.value().len() > 0 {
+                                        app.clear_saved_input();
+                                        app.input_mode = InputMode::Normal;
+                                        app.curr_screen = CurrentScreen::PrepareDownload;
+                                    }
                                 }
                                 _ => {}
                             },
