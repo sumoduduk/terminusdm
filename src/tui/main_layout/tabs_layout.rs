@@ -3,15 +3,17 @@ mod lang_layout;
 use ratatui::{
     layout::{Alignment, Constraint, Layout, Margin, Rect},
     style::{Color, Style},
-    symbols,
-    text::{Line, Span},
-    widgets::{block::Title, Block, BorderType, Borders, Padding, Paragraph, Tabs},
+    text::Line,
+    widgets::{block::Title, Block, BorderType, Borders, Paragraph, Tabs},
     Frame,
 };
 use strum::IntoEnumIterator;
 
-use crate::tui::app::{tabs_state::SelectedTabs, AppTui, CurrentScreen};
-use crate::{config::Language, tui::app::InputMode::*};
+use crate::tui::app::InputMode::*;
+use crate::{
+    tui::app::{tabs_state::SelectedTabs, AppTui, CurrentScreen},
+    words::WORDS,
+};
 
 use self::lang_layout::render_lang_layout;
 
@@ -49,12 +51,17 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let config = &app.setting;
     let lang = &config.language;
 
+    let text_folder = WORDS::ConfigsContentFolder;
+    let text_concur = WORDS::ConfigsContentConcurent;
+    let text_chunk = WORDS::ConfigsContentChunk;
+    let text_min = WORDS::ConfigsContentMinimum;
+
     match app.selected_tabs {
         SelectedTabs::DownloadFolder => {
             let content = config.default_folder.display().to_string();
 
             span_content(
-                "Default Folder (absolute path) :",
+                &text_folder.load_text(lang),
                 &content,
                 content_layout,
                 frame,
@@ -65,7 +72,7 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         SelectedTabs::ConcurrentTotal => {
             let content = config.concurrent_download.to_string();
             span_content(
-                "Number of Concurrent Download :",
+                &text_concur.load_text(lang),
                 &content,
                 content_layout,
                 frame,
@@ -77,7 +84,7 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         SelectedTabs::ChunkSize => {
             let content = config.total_chunk.to_string();
             span_content(
-                "Total Chunk per File :",
+                &text_chunk.load_text(lang),
                 &content,
                 content_layout,
                 frame,
@@ -89,7 +96,7 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         SelectedTabs::MinimunSize => {
             let mininimum_size = config.minimum_size.to_string();
             span_content(
-                "Minimum File Size For Concurrent Download (in KB)",
+                &text_min.load_text(lang),
                 &mininimum_size,
                 content_layout,
                 frame,
@@ -98,21 +105,21 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 
             render_value_input(app, frame, input_layout);
         }
-        _ => {
-            let index = match lang {
-                Language::English => 0,
-                Language::Indonesia => 1,
-            };
-            render_lang_layout(frame, app, inside_area, index);
+        SelectedTabs::Language => {
+            render_lang_layout(frame, app, inside_area);
         }
     };
 }
 
 fn render_value_input(app: &AppTui, frame: &mut Frame, area: Rect) {
+    let lang = &app.setting.language;
+
+    let title_text = WORDS::TabsInputTitle;
+
     let value = app.tab_content_input.value();
     let border = Block::default()
         .borders(Borders::ALL)
-        .title("Enter new value")
+        .title(title_text.load_text(lang))
         .border_style(app.selected_tabs.palette().c400)
         .border_type(BorderType::Rounded);
 
@@ -156,7 +163,7 @@ fn span_content(key: &str, val: &str, area: Rect, frame: &mut Frame, app: &AppTu
 pub fn outer_block_setting(app: &AppTui) -> Block<'static> {
     Block::default()
         .borders(Borders::ALL)
-        .title("Config")
+        .title("Setting")
         .border_type(match app.curr_screen {
             CurrentScreen::Setting => BorderType::Thick,
             _ => BorderType::Rounded,
@@ -168,13 +175,16 @@ pub fn outer_block_setting(app: &AppTui) -> Block<'static> {
 }
 
 fn block(app: &AppTui) -> Block<'static> {
+    let lang = &app.setting.language;
+    let text_lang = WORDS::TabsContentLang;
+    let text_normal = WORDS::TabsContentNormal;
+    let text_edit = WORDS::TabsContentEditing;
+
     let title_tab_content = match app.selected_tabs {
-        SelectedTabs::Language => {
-            "◄ ► to change tab | ▲ ▼  to change language | Press Enter to confirm"
-        }
+        SelectedTabs::Language => text_lang.load_text(lang),
         _ => match app.tab_content_mode {
-            Normal => "◄ ► to change tab | Press e to edit ",
-            Editing => "Press Esc to cancel | Enter to confirm",
+            Normal => text_normal.load_text(lang),
+            Editing => text_edit.load_text(lang),
         },
     };
 
