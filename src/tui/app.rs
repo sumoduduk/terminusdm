@@ -3,8 +3,7 @@ mod table;
 pub mod tabs_state;
 
 use crate::{
-    config::{self, Config, Language},
-    utils::to_vec::string_to_vec,
+    config::{Config, Language},
     DownloadStage, HistoryDownload,
 };
 use indexmap::IndexMap;
@@ -48,13 +47,11 @@ pub struct AppTui {
 
 impl AppTui {
     pub fn new(config_setting: Config) -> Self {
-        let chunk = &config_setting.total_chunk;
         let histo = Histories::new(HISTORY_FILE_NAME);
         let len_histo = histo.len();
 
         Self {
             input_uri: Input::default(),
-            // input_mode: InputMode::Normal,
             curr_screen: CurrentScreen::Main,
             saved_input: Vec::new(),
             history: histo,
@@ -116,13 +113,13 @@ impl AppTui {
                 }
             }
         }
-        self.setting.save_history();
+        self.setting.save_history()?;
         Ok(())
     }
 
     pub fn load_pick(&mut self) {
         let indexes = &self.table.picked;
-        let nums = indexes.iter().for_each(|idx| {
+        indexes.iter().for_each(|idx| {
             let hist = self.history.get_history_by_idx(*idx);
             match hist {
                 Ok((num, hist)) => {
