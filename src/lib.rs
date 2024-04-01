@@ -4,15 +4,13 @@ mod merge_file;
 mod req_lib;
 pub mod tui;
 mod utils;
+mod words;
 
-use eyre::{eyre, OptionExt};
+use eyre::OptionExt;
 use req_lib::HeaderObject;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use trauma::{
-    download::Download,
-    downloader::{Downloader, DownloaderBuilder},
-};
+use trauma::{download::Download, downloader::DownloaderBuilder};
 use tui::app::AppTui;
 
 use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
@@ -64,7 +62,7 @@ impl HistoryDownload {
             url: uri.to_string(),
             stage_download: DownloadStage::READY,
             is_resumable,
-            total_chunk: 16,
+            total_chunk,
             sizes,
         };
 
@@ -79,16 +77,8 @@ impl HistoryDownload {
         ]
     }
 
-    fn file(&self) -> &str {
-        &self.file_name
-    }
-
     fn url(&self) -> &str {
         &self.url
-    }
-
-    fn status(&self) -> String {
-        self.stage_download.to_string()
     }
 }
 
@@ -113,7 +103,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
             .build();
         build.download(&downloder).await;
         app.update_stage(key, DownloadStage::COMPLETE);
-        app.save_history();
+        let _ = app.save_history();
     } else {
         let file_name = &history.file_name;
         let total_chunk = &history.total_chunk;
@@ -126,15 +116,15 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
         let temp = download_path.join("temp").join(&file_name);
 
         app.update_stage(key, DownloadStage::DOWNLOADING);
-        app.save_history();
+        let _ = app.save_history();
         let res = start_download(temp.clone(), &url, &ranges, number_concurrent).await;
 
         if let Ok(_) = res {
             app.update_stage(key, DownloadStage::MERGING);
-            app.save_history();
+            let _ = app.save_history();
             merge(&temp, ranges.len(), &download_path, &file_name).await?;
             app.update_stage(key, DownloadStage::COMPLETE);
-            app.save_history();
+            let _ = app.save_history();
         }
     }
     Ok(())
