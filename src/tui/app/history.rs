@@ -1,11 +1,10 @@
 use std::{
-    collections::BTreeMap,
     fs::{self, create_dir_all, File},
     path::PathBuf,
 };
 
 use eyre::{eyre, OptionExt};
-use indexmap::{IndexMap, IndexSet};
+use indexmap::IndexMap;
 use ron::{
     de::from_reader,
     ser::{to_string_pretty, PrettyConfig},
@@ -27,7 +26,7 @@ impl Histories {
 
         let file_path = Self::check_config_file(dir_path, history_filename);
 
-        let history = match file_path {
+        match file_path {
             Some(file_path) => {
                 let file_path = File::open(file_path).expect("ERROR : Opening config file");
                 let hist: Histories = from_reader(file_path)
@@ -41,21 +40,20 @@ impl Histories {
                     history: map_history,
                 }
             }
-        };
-        history
+        }
     }
 
-    fn swap_position(&mut self, num_a: u32, num_b: u32) -> eyre::Result<()> {
-        let histo_a = self.get_history(num_a)?;
-
-        let histo_b = self
-            .history
-            .insert(num_b, histo_a.clone())
-            .ok_or_eyre("ERROR SWAP: history not exist")?;
-
-        self.history.insert(num_a, histo_b);
-        Ok(())
-    }
+    // fn swap_position(&mut self, num_a: u32, num_b: u32) -> eyre::Result<()> {
+    //     let histo_a = self.get_history(num_a)?;
+    //
+    //     let histo_b = self
+    //         .history
+    //         .insert(num_b, histo_a.clone())
+    //         .ok_or_eyre("ERROR SWAP: history not exist")?;
+    //
+    //     self.history.insert(num_a, histo_b);
+    //     Ok(())
+    // }
 
     pub fn get_history_by_idx(&self, num: usize) -> eyre::Result<(&u32, &HistoryDownload)> {
         let res = self
@@ -74,8 +72,7 @@ impl Histories {
     }
 
     pub fn update_stage(&mut self, num: u32, stage: DownloadStage) {
-        let res = self
-            .history
+        self.history
             .entry(num)
             .and_modify(|h| h.stage_download = stage);
     }
@@ -98,14 +95,14 @@ impl Histories {
         let pretty_config = PrettyConfig::new().depth_limit(4).enumerate_arrays(true);
         let pretty_str = to_string_pretty(self, pretty_config)?;
 
-        fs::write(&file_path, pretty_str)?;
+        fs::write(file_path, pretty_str)?;
 
         Ok(())
     }
 
-    fn remove_history(&mut self, num: usize) -> Option<(u32, HistoryDownload)> {
-        self.history.shift_remove_index(num)
-    }
+    // fn remove_history(&mut self, num: usize) -> Option<(u32, HistoryDownload)> {
+    //     self.history.shift_remove_index(num)
+    // }
 
     pub fn list(&self) -> &IndexMap<u32, HistoryDownload> {
         &self.history
@@ -134,7 +131,7 @@ impl Histories {
     fn check_config_file(path: PathBuf, history_filename: &str) -> Option<PathBuf> {
         let file_path = path.join(history_filename);
 
-        let file_path = file_path.exists().then(|| file_path);
+        let file_path = file_path.exists().then_some(file_path);
 
         file_path
     }
