@@ -1,10 +1,10 @@
 use ratatui::{
-    layout::{Constraint, Margin, Rect},
+    layout::{Alignment, Constraint, Margin, Rect},
     style::{Color, Modifier, Style, Stylize},
     text::Text,
     widgets::{
-        Block, BorderType, Borders, Cell, HighlightSpacing, Row, Scrollbar, ScrollbarOrientation,
-        Table,
+        block::Title, Block, BorderType, Borders, Cell, HighlightSpacing, Row, Scrollbar,
+        ScrollbarOrientation, Table,
     },
     Frame,
 };
@@ -62,6 +62,10 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     .block(
         Block::default()
             .borders(Borders::ALL)
+            .title(
+                Title::from("▲ ▼  to scroll | Press SPACE to select | Press ENTER to Re-Download")
+                    .alignment(Alignment::Right),
+            )
             .border_type(match app.curr_screen {
                 CurrentScreen::Main => BorderType::Thick,
                 _ => BorderType::Rounded,
