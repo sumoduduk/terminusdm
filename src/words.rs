@@ -40,7 +40,7 @@ impl WORDS {
             },
             Self::ExitContent => match language {
                 English => "Would you like to quit? (y/n)",
-                Indonesia => "Apakah anda ingin keluar? (y/n)",
+                Indonesia => "Apa anda ingin keluar? (y/n)",
             },
             Self::ConfigsContentFolder => match language {
                 English => "Default Folder (absolute path) :",
@@ -51,8 +51,8 @@ impl WORDS {
                 Indonesia => "Jumlah Unduhan Bersamaan",
             },
             Self::ConfigsContentChunk => match language {
-                English => "Total Chunk per File :",
-                Indonesia => "Jumlah Part per File",
+                English => "Total Chunk Download per File :",
+                Indonesia => "Jumlah Part Unduhan per File",
             },
             Self::ConfigsContentMinimum => match language {
                 English => "Minimum File Size For Concurrent Download (in Kb)",
@@ -63,7 +63,7 @@ impl WORDS {
                 Indonesia => "Masukan nilai baru",
             },
             Self::TabsContentLang => match language {
-                English => "◄ ► to change tab | ▲ ▼  to change language | Press Enter to confirm",
+                English => "◄ ► to change tab | ▲ ▼  to select language | Press Enter to confirm",
                 Indonesia => "◄ ► untuk mengganti tab | ▲ ▼  untuk memilih bahasa | Tekan Enter untuk melanjutkan",
             },
             Self::TabsContentNormal => match language {
