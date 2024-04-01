@@ -3,6 +3,8 @@ use std::path::Path;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
 
+use crate::utils::fs_utils::get_available_filename;
+
 pub async fn merge(
     out_folder: &Path,
     divisor: usize,
@@ -41,12 +43,13 @@ pub async fn merge(
         num
     });
 
-    let output_name = parent.join(output_name);
+    let output_file = parent.join(output_name);
+    let final_file = get_available_filename(output_file);
 
     let mut file_output = fs::OpenOptions::new()
         .append(true)
         .create(true)
-        .open(output_name)
+        .open(final_file)
         .await?;
 
     for p in file_paths.iter() {
