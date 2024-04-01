@@ -67,36 +67,52 @@ pub async fn run_app<B: Backend>(
                         KeyCode::Char('n') | KeyCode::Char('q') => return Ok(false),
                         _ => (),
                     },
-                    CurrentScreen::Editing => match app.input_mode {
-                        InputMode::Normal => match key.code {
-                            KeyCode::Char('i') => app.input_mode = InputMode::Editing,
-                            KeyCode::Tab => app.curr_screen = CurrentScreen::Setting,
-                            _ => {}
-                        },
-                        InputMode::Editing => match (key.modifiers, key.code) {
-                            (modifiers, KeyCode::Enter) => match modifiers {
-                                KeyModifiers::CONTROL => app.push_to_table().await,
-                                KeyModifiers::NONE => {
-                                    if app.input_uri.value().len() > 0 {
-                                        app.clear_saved_input();
-                                        app.input_mode = InputMode::Normal;
-                                        app.curr_screen = CurrentScreen::PrepareDownload;
-                                    }
-                                }
-                                _ => {}
-                            },
-                            (KeyModifiers::NONE, KeyCode::Esc) => {
-                                app.input_mode = InputMode::Normal
+                    CurrentScreen::Editing => match key.code {
+                        KeyCode::Enter => {
+                            if app.input_uri.value().len() > 0 {
+                                app.clear_saved_input();
+                                app.curr_screen = CurrentScreen::PrepareDownload;
                             }
-                            (KeyModifiers::NONE, KeyCode::Tab) => {
-                                app.input_mode = InputMode::Normal;
-                                app.curr_screen = CurrentScreen::Setting;
-                            }
-                            _ => {
-                                app.input_uri.handle_event(&Event::Key(key));
-                            }
-                        },
+                        }
+                        KeyCode::Esc => {
+                            app.input_uri.reset();
+                            app.curr_screen = CurrentScreen::Exiting;
+                        }
+                        KeyCode::Tab => app.curr_screen = CurrentScreen::Setting,
+                        _ => {
+                            app.input_uri.handle_event(&Event::Key(key));
+                        }
                     },
+                    // CurrentScreen::Editing => match app.input_mode {
+                    //     InputMode::Normal => match key.code {
+                    //         KeyCode::Char('i') => app.input_mode = InputMode::Editing,
+                    //         KeyCode::Tab => app.curr_screen = CurrentScreen::Setting,
+                    //         _ => {}
+                    //     },
+                    //     InputMode::Editing => match (key.modifiers, key.code) {
+                    //         (modifiers, KeyCode::Enter) => match modifiers {
+                    //             KeyModifiers::CONTROL => app.push_to_table().await,
+                    //             KeyModifiers::NONE => {
+                    //                 if app.input_uri.value().len() > 0 {
+                    //                     app.clear_saved_input();
+                    //                     app.input_mode = InputMode::Normal;
+                    //                     app.curr_screen = CurrentScreen::PrepareDownload;
+                    //                 }
+                    //             }
+                    //             _ => {}
+                    //         },
+                    //         (KeyModifiers::NONE, KeyCode::Esc) => {
+                    //             app.input_mode = InputMode::Normal
+                    //         }
+                    //         (KeyModifiers::NONE, KeyCode::Tab) => {
+                    //             app.input_mode = InputMode::Normal;
+                    //             app.curr_screen = CurrentScreen::Setting;
+                    //         }
+                    //         _ => {
+                    //             app.input_uri.handle_event(&Event::Key(key));
+                    //         }
+                    //     },
+                    // },
                     CurrentScreen::ErrorScreen => match key.code {
                         KeyCode::Enter => {
                             app.clear_error_msg();
