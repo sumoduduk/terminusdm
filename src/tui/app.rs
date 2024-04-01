@@ -33,7 +33,7 @@ pub enum InputMode {
 
 pub struct AppTui {
     pub input_uri: Input,
-    pub input_mode: InputMode,
+    // pub input_mode: InputMode,
     pub curr_screen: CurrentScreen,
     pub saved_input: Vec<(u32, String)>,
     pub error_msg: String,
@@ -54,7 +54,7 @@ impl AppTui {
 
         Self {
             input_uri: Input::default(),
-            input_mode: InputMode::Normal,
+            // input_mode: InputMode::Normal,
             curr_screen: CurrentScreen::Main,
             saved_input: Vec::new(),
             history: histo,
