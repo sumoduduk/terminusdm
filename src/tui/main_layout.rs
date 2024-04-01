@@ -59,15 +59,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     let input_par = input_editing(app, width);
     frame.render_widget(input_par, input_setting_layout[0]);
 
-    match app.input_mode {
-        InputMode::Normal => {}
-        InputMode::Editing => frame.set_cursor(
-            input_setting_layout[0].x
-                + ((app.input_uri.visual_cursor().max(scroll_input) - scroll_input) as u16 + 1),
-            input_setting_layout[0].y + 1,
-        ),
-    }
-
     //setting
     let tabs_layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(0)]);
     let setting_inner = input_setting_layout[1].inner(&Margin {
@@ -94,6 +85,23 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
     frame.render_widget(mode_footer, footer_chunk[0]);
     frame.render_widget(key_notes_footer, footer_chunk[1]);
+
+    // match app.input_mode {
+    //     InputMode::Normal => {}
+    //     InputMode::Editing => frame.set_cursor(
+    //         input_setting_layout[0].x
+    //             + ((app.input_uri.visual_cursor().max(scroll_input) - scroll_input) as u16 + 1),
+    //         input_setting_layout[0].y + 1,
+    //     ),
+    // }
+
+    if let CurrentScreen::Editing = app.curr_screen {
+        frame.set_cursor(
+            input_setting_layout[0].x
+                + ((app.input_uri.visual_cursor().max(scroll_input) - scroll_input) as u16 + 1),
+            input_setting_layout[0].y + 1,
+        );
+    }
 
     if let CurrentScreen::ErrorScreen = app.curr_screen {
         frame.render_widget(Clear, frame.size());
