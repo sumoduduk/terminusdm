@@ -6,9 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 
+[profile.release]
+strip = true
+opt-level = "s"
+lto  = true
+codegen-units = 1
+
 [lints.rust]
 unsafe_code = "forbid"
-unused = "allow" # For exploratory dev.
+# unused = "allow" # For exploratory dev.
 
 [dependencies]
 dirs = "5.0.1"
