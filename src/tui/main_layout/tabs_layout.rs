@@ -53,7 +53,13 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         SelectedTabs::DownloadFolder => {
             let content = config.default_folder.display().to_string();
 
-            span_content("Default Folder :", &content, content_layout, frame, app);
+            span_content(
+                "Default Folder (absolute path) :",
+                &content,
+                content_layout,
+                frame,
+                app,
+            );
             render_value_input(app, frame, input_layout);
         }
         SelectedTabs::ConcurrentTotal => {
@@ -83,7 +89,7 @@ pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
         SelectedTabs::MinimunSize => {
             let mininimum_size = config.minimum_size.to_string();
             span_content(
-                "Minimum Download File Size For Concurrent Download",
+                "Minimum File Size For Concurrent Download (in KB)",
                 &mininimum_size,
                 content_layout,
                 frame,
