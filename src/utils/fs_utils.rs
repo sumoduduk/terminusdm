@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::PathBuf;
 
 pub fn get_available_filename(mut filename: PathBuf) -> PathBuf {
