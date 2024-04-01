@@ -1,11 +1,11 @@
 mod event_tab;
 
-use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::{backend::Backend, widgets::Paragraph, Terminal};
+use crossterm::event::{self, Event, KeyCode};
+use ratatui::{backend::Backend, Terminal};
 use tui_input::backend::crossterm::EventHandler;
 
 use super::{
-    app::{AppTui, CurrentScreen, InputMode},
+    app::{AppTui, CurrentScreen},
     main_layout::ui,
 };
 
@@ -46,9 +46,9 @@ pub async fn run_app<B: Backend>(
                         KeyCode::Char('n') => app.curr_screen = CurrentScreen::Main,
                         KeyCode::Enter | KeyCode::Char('y') => match app.save_input().await {
                             Ok(_) => {
+                                app.input_uri.reset();
                                 app.save_history()?;
                                 return Ok(true);
-                                app.input_uri.reset();
                             }
                             Err(err) => {
                                 app.set_error_msg(err.to_string());
@@ -69,7 +69,7 @@ pub async fn run_app<B: Backend>(
                     },
                     CurrentScreen::Editing => match key.code {
                         KeyCode::Enter => {
-                            if app.input_uri.value().len() > 0 {
+                            if !app.input_uri.value().is_empty() {
                                 app.clear_saved_input();
                                 app.curr_screen = CurrentScreen::PrepareDownload;
                             }
