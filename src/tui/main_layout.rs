@@ -13,7 +13,7 @@ use ratatui::{
 };
 
 use self::{
-    body_tui::{input_editing, popup_exit, user_settings},
+    body_tui::{input_editing, popup_exit},
     download_popup::{render_begin_download, render_download_popup},
     error_popup::popup_error,
     footer_tui::{footer_comp_mode, footer_comp_notes},
@@ -22,7 +22,7 @@ use self::{
     tabs_layout::{outer_block_setting, render_tabs, render_tabs_content},
 };
 
-use super::app::{AppTui, CurrentScreen, InputMode};
+use super::app::{AppTui, CurrentScreen};
 
 pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     let screen = Layout::default()
@@ -127,7 +127,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     if let CurrentScreen::Exiting = app.curr_screen {
         frame.render_widget(Clear, frame.size());
 
-        let exit_paragraph = popup_exit();
+        let exit_paragraph = popup_exit(app);
 
         let area = centered_rect(60, 25, frame.size());
         frame.render_widget(exit_paragraph, area);
