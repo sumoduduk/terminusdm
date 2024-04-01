@@ -35,6 +35,7 @@ mod tests {
     use eyre::{eyre, OptionExt};
 
     const URI : &str = "https://huggingface.co/datasets/ym0v0my/Time_series_dataset/resolve/main/all_six_datasets.zip?download=true";
+    const URI_2: &str = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/dcf6f112-d385-4fea-8c08-1aa8457ffec4/transcode=true,width=450/AD_00010.webm";
 
     #[test]
     fn test_dirs() {
@@ -75,6 +76,26 @@ mod tests {
 
         dbg!(&res);
         assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_single_download() -> eyre::Result<()> {
+        let dl = Download::try_from(URI_2);
+
+        assert!(&dl.is_ok());
+
+        let downloder = vec![dl.expect("get dl")];
+        let build = DownloaderBuilder::new()
+            .directory(PathBuf::from("test/Downloads/"))
+            .build();
+
+        let arr = build.download(&downloder).await;
+
+        dbg!(arr);
+
+        assert_eq!(false, true);
 
         Ok(())
     }
