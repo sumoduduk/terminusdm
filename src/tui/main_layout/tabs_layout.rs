@@ -165,7 +165,7 @@ pub fn outer_block_setting(app: &AppTui) -> Block<'static> {
         .borders(Borders::ALL)
         .title("Setting")
         .border_type(match app.curr_screen {
-            CurrentScreen::Setting => BorderType::Thick,
+            CurrentScreen::Setting => BorderType::Double,
             _ => BorderType::Rounded,
         })
         .border_style(match app.curr_screen {
@@ -188,8 +188,13 @@ fn block(app: &AppTui) -> Block<'static> {
         },
     };
 
+    let title_nav = match app.curr_screen {
+        CurrentScreen::Setting => title_tab_content,
+        _ => "".to_string(),
+    };
+
     Block::default()
-        .title(Title::from(title_tab_content).alignment(Alignment::Right))
+        .title(Title::from(title_nav).alignment(Alignment::Right))
         .borders(Borders::TOP)
         .border_style(app.selected_tabs.palette().c500)
 }

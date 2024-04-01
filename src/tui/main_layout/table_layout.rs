@@ -56,21 +56,27 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let language = &app.setting.language;
     let nav = WORDS::TableNav;
 
+    let title_nav = match app.curr_screen {
+        CurrentScreen::Main => nav.load_text(language),
+        _ => "".to_string(),
+    };
+
     let tables = Table::new(
         rows,
         [
             Constraint::Length(column_width),
             Constraint::Min(column_width * 2),
-            Constraint::Min(column_width),
+            Constraint::Length(20),
         ],
     )
     .header(header)
     .block(
         Block::default()
             .borders(Borders::ALL)
-            .title(Title::from(nav.load_text(language)).alignment(Alignment::Right))
+            .title("History")
+            .title(Title::from(title_nav).alignment(Alignment::Right))
             .border_type(match app.curr_screen {
-                CurrentScreen::Main => BorderType::Thick,
+                CurrentScreen::Main => BorderType::Double,
                 _ => BorderType::Rounded,
             })
             .border_style(match app.curr_screen {

@@ -17,16 +17,21 @@ pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
     let input_title = WORDS::InputTitle;
     let input_nav = WORDS::InputNavigation;
 
+    let title_nav = match app.curr_screen {
+        CurrentScreen::Editing => input_nav.load_text(lang),
+        _ => "".to_string(),
+    };
+
     let input_components = Block::default()
         .title(input_title.load_text(lang))
-        .title(Title::from(input_nav.load_text(lang)).alignment(Alignment::Right))
+        .title(Title::from(title_nav).alignment(Alignment::Right))
         .borders(Borders::ALL)
         .border_style(match app.curr_screen {
             CurrentScreen::Editing => Style::default().fg(Color::Cyan),
             _ => Style::default(),
         })
         .border_type(match app.curr_screen {
-            CurrentScreen::Editing => BorderType::Thick,
+            CurrentScreen::Editing => BorderType::Double,
             _ => BorderType::Rounded,
         });
 
