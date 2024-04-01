@@ -36,7 +36,7 @@ impl Config {
             .map_err(|err| println!("ERR : {err}"))
             .unwrap();
 
-        let config = match Self::check_config_file(path_folder, CONFIG_FILENAME) {
+        match Self::check_config_file(path_folder, CONFIG_FILENAME) {
             Some(file_config) => {
                 let file_path =
                     File::open(file_config).expect("ERROR : Error while open config folder");
@@ -63,9 +63,7 @@ impl Config {
                     .expect("Error: create config file");
                 default_config
             }
-        };
-
-        config
+        }
     }
 
     pub fn update_default_folder(&mut self, path_str: &str) -> eyre::Result<()> {
@@ -110,7 +108,7 @@ impl Config {
         let pretty_config = PrettyConfig::new().depth_limit(4).enumerate_arrays(true);
         let pretty_str = to_string_pretty(conf, pretty_config)?;
 
-        fs::write(&file_path, pretty_str)?;
+        fs::write(file_path, pretty_str)?;
 
         Ok(())
     }
@@ -125,7 +123,7 @@ impl Config {
         let pretty_config = PrettyConfig::new().depth_limit(4).enumerate_arrays(true);
         let pretty_str = to_string_pretty(self, pretty_config)?;
 
-        fs::write(&file_path, pretty_str)?;
+        fs::write(file_path, pretty_str)?;
 
         Ok(())
     }
@@ -153,8 +151,6 @@ impl Config {
     fn check_config_file(path: PathBuf, history_filename: &str) -> Option<PathBuf> {
         let file_path = path.join(history_filename);
 
-        let file_path = file_path.exists().then(|| file_path);
-
-        file_path
+        file_path.exists().then_some(file_path)
     }
 }
