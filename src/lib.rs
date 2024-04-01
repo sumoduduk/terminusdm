@@ -104,7 +104,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
     let size_min = &app.setting.minimum_size;
     let sizes = &history.sizes;
-    let is_minimun = size_min > sizes;
+    let is_minimun = size_min * 1000 > *sizes;
 
     if !is_resumable || is_minimun {
         let downloder = vec![Download::try_from(url)?];
