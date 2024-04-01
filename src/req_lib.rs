@@ -1,4 +1,4 @@
-use eyre::{eyre, OptionExt};
+use eyre::OptionExt;
 use reqwest::{
     header::{HeaderMap, ACCEPT_RANGES, CONTENT_LENGTH},
     Client, Url,
@@ -27,13 +27,7 @@ impl HeaderObject {
 
     pub fn is_ranges(&self) -> bool {
         let accept_range = match self.header.get(ACCEPT_RANGES) {
-            Some(x) => {
-                if x == "none" {
-                    false
-                } else {
-                    true
-                }
-            }
+            Some(x) => x != "none",
             None => false,
         };
         accept_range
