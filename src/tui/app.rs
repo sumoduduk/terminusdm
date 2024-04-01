@@ -142,19 +142,9 @@ impl AppTui {
         let input_value = input_value.value();
         let chunks = self.setting.total_chunk;
 
-        // TODO
-        if input_value.contains(',') {
-            let vec_str = string_to_vec(input_value);
-            for uri in &vec_str {
-                let histo = HistoryDownload::new(uri, chunks).await?;
-                let num = self.add_history(histo);
-                self.saved_input.push((num, uri.to_string()));
-            }
-        } else {
-            let histo = HistoryDownload::new(input_value, chunks).await?;
-            let num = self.add_history(histo);
-            self.saved_input.push((num, input_value.to_string()));
-        }
+        let histo = HistoryDownload::new(input_value, chunks).await?;
+        let num = self.add_history(histo);
+        self.saved_input.push((num, input_value.to_string()));
 
         self.input_uri.reset();
         Ok(())
