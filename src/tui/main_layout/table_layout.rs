@@ -9,7 +9,10 @@ use ratatui::{
     Frame,
 };
 
-use crate::tui::app::{AppTui, CurrentScreen};
+use crate::{
+    tui::app::{AppTui, CurrentScreen},
+    words::WORDS,
+};
 
 pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let width = area.width;
@@ -50,6 +53,9 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 
     let bar = " █ ";
 
+    let language = &app.setting.language;
+    let nav = WORDS::TableNav;
+
     let tables = Table::new(
         rows,
         [
@@ -62,10 +68,7 @@ pub fn render_table(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     .block(
         Block::default()
             .borders(Borders::ALL)
-            .title(
-                Title::from("▲ ▼  to scroll | Press SPACE to select | Press ENTER to Re-Download")
-                    .alignment(Alignment::Right),
-            )
+            .title(Title::from(nav.load_text(language)).alignment(Alignment::Right))
             .border_type(match app.curr_screen {
                 CurrentScreen::Main => BorderType::Thick,
                 _ => BorderType::Rounded,
