@@ -1,7 +1,8 @@
 use ratatui::{
+    layout::Alignment,
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{Block, BorderType, Borders, List, ListItem, Paragraph, Wrap},
+    widgets::{block::Title, Block, BorderType, Borders, List, ListItem, Paragraph, Wrap},
 };
 
 use crate::tui::app::{AppTui, CurrentScreen, InputMode};
@@ -10,7 +11,8 @@ pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
     let scroll_input = app.input_uri.visual_scroll(width as usize);
 
     let input_components = Block::default()
-        .title("Enter a URI")
+        .title("Enter a URL")
+        .title(Title::from("Press ENTER to download | ESC to quit").alignment(Alignment::Right))
         .borders(Borders::ALL)
         .border_style(match app.curr_screen {
             CurrentScreen::Editing => Style::default().fg(Color::Cyan),
@@ -24,10 +26,10 @@ pub fn input_editing(app: &AppTui, width: u16) -> Paragraph<'static> {
     let value = app.input_uri.value();
 
     let input_par = Paragraph::new(value.to_string())
-        .style(match app.input_mode {
-            InputMode::Normal => Style::default(),
-            InputMode::Editing => Style::default().fg(Color::Magenta),
-        })
+        // .style(match app.input_mode {
+        //     InputMode::Normal => Style::default(),
+        //     InputMode::Editing => Style::default().fg(Color::Magenta),
+        // })
         .block(input_components)
         .scroll((0, scroll_input as u16));
 
@@ -50,12 +52,12 @@ pub fn user_settings(app: &AppTui) -> Block<'static> {
 
 pub fn popup_exit() -> Paragraph<'static> {
     let popup_exit_component = Block::default()
-        .title("Y/N")
+        .title("Press Y to confirm/N to cancel")
         .borders(Borders::NONE)
         .style(Style::default().bg(Color::DarkGray));
 
     let exit_text = Text::styled(
-        "Would you like to output the buffer as json? (y/n)",
+        "Would you like to quit? (y/n)",
         Style::default().fg(Color::Red),
     );
     let exit_paragraph = Paragraph::new(exit_text)
