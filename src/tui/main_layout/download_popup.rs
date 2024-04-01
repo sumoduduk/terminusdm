@@ -1,4 +1,4 @@
-use crate::{tui::app::AppTui, utils::to_vec::string_to_vec};
+use crate::{tui::app::AppTui, words::WORDS};
 
 use ratatui::{
     layout::{Alignment, Constraint, Layout, Rect},
@@ -9,14 +9,19 @@ use ratatui::{
 };
 
 pub fn render_download_popup(frame: &mut Frame, app: &mut AppTui, area: Rect) {
+    let language = &app.setting.language;
+    let title = WORDS::DownloadTitle;
+    let nav = WORDS::DownloadNav;
+    let content = WORDS::DownlaodContent;
+
     let popup_download_component = Block::default()
-        .title("Begin Download")
-        .title(Title::from("Press Y to download | N to cancel").alignment(Alignment::Right))
+        .title(title.load_text(language))
+        .title(Title::from(nav.load_text(language)).alignment(Alignment::Right))
         .borders(Borders::NONE)
         .style(Style::default().bg(Color::DarkGray));
 
     let mut download_text = vec![Line::styled(
-        "Would you like download from this url? (y/n) : ",
+        content.load_text(language),
         Style::default().fg(Color::White),
     )];
 
@@ -36,9 +41,15 @@ pub fn render_download_popup(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 }
 
 pub fn render_begin_download(frame: &mut Frame, app: &mut AppTui, area: Rect) {
+    let language = &app.setting.language;
+    let title = WORDS::DownloadPrepareTitle;
+    let nav = WORDS::DownloadNav;
+    let content = WORDS::DownlaodContent;
+    let loading = WORDS::DownloadLoading;
+
     let popup_download_component = Block::default()
-        .title("Prepare to  Download")
-        .title(Title::from("Press Y to download | N to cancel").alignment(Alignment::Right))
+        .title(title.load_text(language))
+        .title(Title::from(nav.load_text(language)).alignment(Alignment::Right))
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
         .style(Style::default().bg(Color::Black));
@@ -52,9 +63,9 @@ pub fn render_begin_download(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 
     let input_val = &app.input_uri.value();
 
-    let mut download_text = vec![
+    let download_text = vec![
         Line::styled(
-            "Would you like download from this url? (y/n) : ",
+            content.load_text(language),
             Style::default().fg(Color::White),
         ),
         Line::styled(input_val.to_string(), Style::default().fg(Color::White)),
@@ -67,7 +78,7 @@ pub fn render_begin_download(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     frame.render_widget(download_paragraph, upper_l);
 
     let loading = throbber_widgets_tui::Throbber::default()
-        .label("preparing to download, please wait...")
+        .label(loading.load_text(language))
         .style(Style::default().fg(Color::Cyan))
         .throbber_style(
             Style::default()
