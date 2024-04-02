@@ -154,3 +154,19 @@ impl Config {
         file_path.exists().then_some(file_path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_new() {
+        let mut config = Config::new();
+
+        config.update_concurrent_download("10").unwrap();
+
+        let concur = config.concurrent_download;
+
+        assert_eq!(10, concur);
+    }
+}
