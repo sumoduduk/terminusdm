@@ -11,28 +11,32 @@ const VERSION: &str = "1.0.0";
 
 pub fn header_comp(frame: &mut Frame, area: Rect) {
     let width = area.width;
+    let height = area.height;
 
     let title_content = match width {
-        width if width > 28 => "Terminal Download Manager",
+        width if width > 30 => "Terminal Download Manager",
         _ => "TDM",
     };
 
-    let title = Line::from(format!("[ {} ]", title_content));
-    let version = Line::from(format!("[ v{}{} ] ", symbols::DOT, VERSION));
+    let title = Line::from(format!("[ {} ]", title_content)).centered();
+    let version = Line::from(format!("[ v{}{} ] ", symbols::DOT, VERSION)).centered();
+    let para = Paragraph::new(vec![title, version]);
 
-    let title_block = Paragraph::new(vec![title, version])
-        .block(title_outer_block())
+    let y = (height - 5) / 2;
+
+    let title_block = para
+        .block(title_outer_block(y))
         .centered()
         .style(Style::default().fg(Color::Blue));
 
     frame.render_widget(title_block, area)
 }
 
-fn title_outer_block() -> Block<'static> {
+fn title_outer_block(num: u16) -> Block<'static> {
     let block = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::Blue))
-        .padding(Padding::vertical(3))
+        .padding(Padding::vertical(num))
         .border_type(BorderType::Rounded);
 
     block
