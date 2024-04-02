@@ -1900,7 +1900,7 @@ dependencies = [
 [[package]]
 name = "trauma"
 version = "2.2.4"
-source = "git+https://github.com/sumoduduk/trauma.git?rev=267a1d886d5aa809eda02e1bdb425039285d55db#267a1d886d5aa809eda02e1bdb425039285d55db"
+source = "git+https://github.com/sumoduduk/trauma.git?rev=1627cacc74787c08e1e4406384f20e9db83d8b3d#1627cacc74787c08e1e4406384f20e9db83d8b3d"
 dependencies = [
  "form_urlencoded",
  "futures",
