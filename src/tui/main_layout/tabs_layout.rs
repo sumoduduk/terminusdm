@@ -36,17 +36,11 @@ pub fn render_tabs(frame: &mut Frame, app: &mut AppTui, area: Rect) {
 pub fn render_tabs_content(frame: &mut Frame, app: &mut AppTui, area: Rect) {
     let block_content = block(app);
     frame.render_widget(block_content, area);
-    let inside_area = area.inner(&Margin {
-        horizontal: 1,
-        vertical: 1,
-    });
+    let outer = Layout::vertical([Constraint::Fill(1), Constraint::Fill(4)]);
+    let [_, inside_area] = outer.areas(area);
 
-    let inside_rect = Layout::vertical([
-        Constraint::Fill(1),
-        Constraint::Length(1),
-        Constraint::Length(3),
-    ]);
-    let [_, content_layout, input_layout] = inside_rect.areas(inside_area);
+    let inside_rect = Layout::vertical([Constraint::Length(1), Constraint::Length(3)]);
+    let [content_layout, input_layout] = inside_rect.areas(inside_area);
 
     let config = &app.setting;
     let lang = &config.language;
