@@ -14,7 +14,7 @@ pub fn header_comp(frame: &mut Frame, area: Rect) {
     let height = area.height;
 
     let title_content = match width {
-        width if width > 30 => "Terminal Download Manager",
+        width if width > 30 => "Terminus Download Manager",
         _ => "TDM",
     };
 
