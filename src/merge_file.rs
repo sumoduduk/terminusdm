@@ -83,10 +83,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_bin_merge() {
-        let path_str = "/home/calista/Downloads/tdm/temp/pytorch_model.bin/";
-        let path = Path::new(path_str);
+        let home_dir = dirs::home_dir().unwrap();
+        let path_str = "Downloads/tdm/temp/pytorch_model.bin/";
+        let path = home_dir.join(path_str);
 
-        let res = merge(path, 16, path, "output.bin").await;
+        let res = merge(&path, 16, &path, "output.bin").await;
         dbg!(&res);
 
         assert!(res.is_ok());
