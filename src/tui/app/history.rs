@@ -111,7 +111,7 @@ impl Histories {
     fn get_file_history(history_filename: &str) -> eyre::Result<PathBuf> {
         let dir_config = dirs::config_dir().ok_or_eyre("ERROR: config directory not available")?;
 
-        let config_file = dir_config.join("tdm").join(history_filename);
+        let config_file = dir_config.join("terminusdm").join(history_filename);
 
         Ok(config_file)
     }
@@ -119,7 +119,7 @@ impl Histories {
     fn check_config_folder() -> eyre::Result<PathBuf> {
         let dir_config = dirs::config_dir().ok_or_eyre("ERROR: config directory not available")?;
 
-        let config_file = dir_config.join("tdm");
+        let config_file = dir_config.join("terminus");
 
         if !config_file.exists() {
             create_dir_all(&config_file)?;
