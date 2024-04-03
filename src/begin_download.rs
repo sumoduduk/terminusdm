@@ -1,3 +1,5 @@
+pub mod trauma;
+
 use reqwest::Url;
 use std::path::PathBuf;
 use trauma::download::{Download, Summary};
