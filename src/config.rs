@@ -49,7 +49,7 @@ impl Config {
                 let dir_home = dirs::home_dir()
                     .ok_or_eyre("ERROR: failed to get home dir")
                     .unwrap();
-                let download_path = dir_home.join("Downloads").join("tdm");
+                let download_path = dir_home.join("Downloads").join("terminusdm");
 
                 let default_config = Config {
                     default_folder: download_path,
@@ -131,7 +131,7 @@ impl Config {
     fn get_file_history(history_filename: &str) -> eyre::Result<PathBuf> {
         let dir_config = dirs::config_dir().ok_or_eyre("ERROR: config directory not available")?;
 
-        let config_file = dir_config.join("tdm").join(history_filename);
+        let config_file = dir_config.join("terminusdm").join(history_filename);
 
         Ok(config_file)
     }
@@ -139,7 +139,7 @@ impl Config {
     fn check_config_folder() -> eyre::Result<PathBuf> {
         let dir_config = dirs::config_dir().ok_or_eyre("ERROR: config directory not available")?;
 
-        let config_file = dir_config.join("tdm");
+        let config_file = dir_config.join("terminusdm");
 
         if !config_file.exists() {
             create_dir_all(&config_file)?;
