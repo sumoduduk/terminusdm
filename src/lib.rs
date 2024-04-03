@@ -10,10 +10,16 @@ use eyre::OptionExt;
 use req_lib::HeaderObject;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use trauma::{download::Download, downloader::DownloaderBuilder};
 use tui::app::AppTui;
 
-use crate::{begin_download::start_download, merge_file::merge, utils::create_range};
+use crate::{
+    begin_download::{
+        start_download,
+        trauma::{download::Download, downloader::DownloaderBuilder},
+    },
+    merge_file::merge,
+    utils::create_range,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum DownloadStage {
