@@ -6,6 +6,11 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::{backend::CrosstermBackend, Terminal};
+use terminusdm::{
+    config::Config,
+    download_chunk,
+    tui::{app::AppTui, event_tui},
+};
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -17,10 +22,10 @@ async fn main() -> eyre::Result<()> {
 
         let mut terminal = Terminal::new(CrosstermBackend::new(stderr))?;
 
-        let config = tdm::config::Config::new();
-        let mut app = tdm::tui::app::AppTui::new(config);
+        let config = Config::new();
+        let mut app = AppTui::new(config);
 
-        let res = tdm::tui::event_tui::run_app(&mut terminal, &mut app).await;
+        let res = event_tui::run_app(&mut terminal, &mut app).await;
 
         disable_raw_mode()?;
         execute!(
@@ -28,8 +33,9 @@ async fn main() -> eyre::Result<()> {
             LeaveAlternateScreen,
             DisableMouseCapture
         )?;
-        terminal.show_cursor()?;
+
         terminal.clear()?;
+        terminal.show_cursor()?;
 
         match res {
             Ok(do_print) => {
@@ -39,7 +45,7 @@ async fn main() -> eyre::Result<()> {
                         println!("empty");
                     } else {
                         for (key_value, _) in vec_value {
-                            tdm::download_chunk(&mut app, *key_value).await?;
+                            download_chunk(&mut app, *key_value).await?;
                         }
                     }
                 } else {
