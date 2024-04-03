@@ -2,24 +2,23 @@
 name = "terminusdm"
 version = "1.0.0"
 edition = "2021"
-license = "GPLv2+"
+license = "GPL-3.0-or-later"
 include = [
 	"src/**/*",
 	"Cargo.toml",
 	"README.md",
-	"LICENCE"
+	"LICENSE"
 ]
 homepage = "https://github.com/sumoduduk/terminusdm"
 description = "Terminus Download Manager. Download files, resume interrupted downloads, and keep a history of your downloads - within terminal UI. "
 repository = "https://github.com/sumoduduk/terminusdm"
 keywords = [
 	"cli",
-	"download",
   "terminal-ui",
-  "internet-download-manager",
-  'resumable-download'
+  "download-manager",
+  "resumable-download"
 ]
-categories = ["terminal-ui", "download-manager"]
+categories = ["asynchronous", "command-line-utilities", "concurrency", "filesystem"]
 authors = ["Iqbal Abdurachman <email@abdurachmaniqbal.my.id>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
