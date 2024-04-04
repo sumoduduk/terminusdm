@@ -1,28 +1,52 @@
-# TerminusDM: Terminal-UI Download Manager
+# TerminusDM: Cross Platform Terminal Download Manager
 
-TerminusDM is a powerful terminal application download manager built with Rust. It offers a user-friendly terminal interface for managing your downloads efficiently.
+![terminusdm](./assets/terminusdm.mp4)
 
-### Features
+TerminusDM is a powerful cross-platform terminal application download manager built with Rust. It offers a user-friendly terminal interface for managing your downloads efficiently.
 
-- Download files the command line.
-- Maintain a history of your downloads - with terminal ui.
-- Splitting files into smaller parts and downloading them concurrently
+## Features
+
 - Resume interrupted downloads seamlessly.
-- Built with Rust, ensuring performance and reliability.
+- Maintain a history of your downloads - with terminal ui.
+- Splitting files into smaller parts and downloading them concurrently.
 
-### Installation
+## Installation
 
-- **\*Prerequisites:**
+### Arch Linux (via AUR)
+
+- Download the AUR package for terminusdm: (You can install it with your favourite AUR helper)
+
+```bash
+yay -S terminusdm-bin
+
+```
+
+### MacOS
+
+- **Prerequisites:**
+
+Install Homebrew [brew.sh](https://brew.sh/)
+
+- **Install it:**
+
+```bash
+brew tap sumoduduk/tap && brew install terminusdm
+
+```
+
+### Other OS and Distro
+
+- **Prerequisites:**
 
 Rust and Cargo installed on your system. You can find installation instructions at [https://www.rust-lang.org/](https://www.rust-lang.org/).
 
-- **\*Install it with cargo:**
+- **Install it with cargo:**
 
   ```bash
   cargo install terminusdm
   ```
 
-### Usage
+## Usage
 
 1. Open a terminal.
 
