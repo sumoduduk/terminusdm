@@ -1,6 +1,6 @@
 # TerminusDM: Cross Platform Terminal Download Manager
 
-![terminusdm](./assets/terminusdm.mp4)
+![terminusdm](./assets/terminusdm.webp)
 
 TerminusDM is a powerful cross-platform terminal application download manager built with Rust. It offers a user-friendly terminal interface for managing your downloads efficiently.
 
