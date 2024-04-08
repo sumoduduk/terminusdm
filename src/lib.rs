@@ -53,13 +53,17 @@ pub struct HistoryDownload {
 //need fix
 impl HistoryDownload {
     async fn new(uri: &str, total_chunk: u64) -> eyre::Result<Self> {
-        let header_obj = HeaderObject::new(uri).await?;
+        let real_url = Self::get_download_url(uri).await?;
+        let header_obj = HeaderObject::new(real_url.clone()).await?;
         let is_resumable = header_obj.is_ranges();
         let file_name = header_obj
             .get_filename()
             .ok_or_eyre("Error: Can't get file_name")?;
 
-        let sizes = header_obj.get_sizes()?;
+        let sizes = match header_obj.get_sizes() {
+            Ok(size) => size,
+            Err(_) => 0,
+        };
 
         let hist = Self {
             file_name,
@@ -84,6 +88,16 @@ impl HistoryDownload {
     fn url(&self) -> &str {
         &self.url
     }
+
+    async fn get_download_url(url: &str) -> eyre::Result<Url> {
+        let res = reqwest::get(url).await?;
+        Ok(res.url().to_owned())
+    }
+
+    async fn get_real_url(&self) -> eyre::Result<Url> {
+        let res = reqwest::get(self.url()).await?;
+        Ok(res.url().to_owned())
+    }
 }
 
 pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
@@ -92,6 +106,10 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
     let is_resumable = &history.is_resumable;
     println!("Begin Download : {url}");
 
+    let file_name = &history.file_name;
+
+    let real_url = history.get_real_url().await?;
+
     let download_path = &app.setting.default_folder.clone();
 
     let size_min = &app.setting.minimum_size;
@@ -99,7 +117,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
     let is_minimun = size_min * 1000 > *sizes;
 
     if !is_resumable || is_minimun {
-        let downloder = vec![Download::try_from(url)?];
+        let downloder = vec![Download::new(&real_url, file_name, None)];
         let build = DownloaderBuilder::new()
             .directory(download_path.clone())
             .build();
@@ -107,9 +125,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
         app.update_stage(key, DownloadStage::COMPLETE);
         let _ = app.save_history();
     } else {
-        let file_name = &history.file_name;
         let total_chunk = &history.total_chunk;
-        let url = Url::parse(url)?;
         let number_concurrent = app.setting.concurrent_download;
 
         let ranges =
@@ -119,7 +135,7 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
         app.update_stage(key, DownloadStage::DOWNLOADING);
         let _ = app.save_history();
-        let res = start_download(temp.clone(), &url, &ranges, number_concurrent).await;
+        let res = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await;
 
         if let Ok(_) = res {
             app.update_stage(key, DownloadStage::MERGING);
