@@ -49,6 +49,11 @@ mod tests {
         assert_eq!(true, true);
     }
 
+    async fn get_download_url(url: &str) -> eyre::Result<Url> {
+        let res = reqwest::get(url).await?;
+        Ok(res.url().to_owned())
+    }
+
     #[tokio::test]
     async fn test_concurent_donwload() -> eyre::Result<()> {
         let download_dirs = dirs::download_dir()
@@ -57,7 +62,8 @@ mod tests {
 
         let temp = download_dirs.join("temp");
 
-        let header_obj = HeaderObject::new(&URI).await?;
+        let url = get_download_url(URI).await?;
+        let header_obj = HeaderObject::new(url).await?;
         if !header_obj.is_ranges() {
             return Err(eyre!("Not Resumable"));
         }
