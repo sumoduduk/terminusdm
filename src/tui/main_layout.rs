@@ -32,7 +32,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
 
     let body_layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(screen[0]);
 
     let upper_body = Layout::default()
@@ -50,7 +50,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppTui) {
     //upper body
     let input_setting_layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Length(4), Constraint::Fill(1)])
+        .constraints([Constraint::Fill(1), Constraint::Min(8)])
         .split(upper_body[0]);
 
     let width = input_setting_layout[0].width.max(3) - 3;
