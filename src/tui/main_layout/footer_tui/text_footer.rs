@@ -15,8 +15,8 @@ impl TextFooter {
     pub fn load_text(&self, language: &Language) -> String {
         let text = match self {
             SpanEditing => match language {
-                English => "Press ENTER to Re-Download",
-                Indonesia => "Tekan ENTER untuk mengunduh ulang",
+                English => "Press TAB to Switch Pane",
+                Indonesia => "Tekan Tab untuk berpindah Mode",
             },
             NoteMain => match language {
                 English => "(q) to quit/Tab to switch/Space to select URL",
