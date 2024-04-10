@@ -34,13 +34,10 @@ pub fn footer_comp_mode(app: &AppTui) -> Paragraph<'static> {
 
     let divider_span = Span::styled(" | ", Style::default().fg(Color::White));
 
-    let is_editing_span = match app.curr_screen {
-        CurrentScreen::Main => Span::styled(
-            span_editing.load_text(language),
-            Style::default().fg(Color::Green),
-        ),
-        _ => Span::styled(" ", Style::default().fg(Color::LightGreen)),
-    };
+    let is_editing_span = Span::styled(
+        span_editing.load_text(language),
+        Style::default().fg(Color::Red),
+    );
 
     let curr_navigation_text = vec![cur_span, divider_span, is_editing_span];
 
