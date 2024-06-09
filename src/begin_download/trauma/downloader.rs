@@ -178,7 +178,7 @@ impl Downloader {
         let mut req = client.get(download.url.clone());
 
         if let Some(range_str) = download.range_header {
-            if can_resume {
+            if size_on_disk > 0 {
                 let start = size_on_disk + range_str.0;
                 let end = range_str.1;
                 req = req.header(RANGE, format!("bytes={start}-{end}"));
