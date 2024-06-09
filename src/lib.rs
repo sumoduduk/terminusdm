@@ -4,6 +4,7 @@ mod merge_file;
 mod req_lib;
 pub mod tui;
 mod utils;
+mod validate_merge;
 mod words;
 
 use eyre::OptionExt;
@@ -11,6 +12,7 @@ use req_lib::HeaderObject;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use tui::app::AppTui;
+use validate_merge::check;
 
 use crate::{
     begin_download::{
@@ -137,7 +139,12 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
         let _ = app.save_history();
         let res = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await;
 
-        if let Ok(_) = res {
+        if let Ok(res) = res {
+            let list_uncomplete = check(&res, &ranges);
+
+            let _ =
+                start_download(temp.clone(), &real_url, &list_uncomplete, number_concurrent).await;
+
             app.update_stage(key, DownloadStage::MERGING);
             let _ = app.save_history();
             merge(&temp, ranges.len(), &download_path, &file_name).await?;
