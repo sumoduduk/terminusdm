@@ -28,17 +28,11 @@ pub async fn merge(
     }
 
     file_paths.sort_by_key(|p| {
-        let str_path = p.file_name().and_then(|os_str| os_str.to_str());
-
-        let mut num = 0;
-
-        match str_path {
-            Some(file_str) => match file_str.parse::<u32>() {
-                Ok(num_res) => num = num_res,
-                Err(err) => println!("ERROR: {err}"),
-            },
-            None => println!("ERROR: failed to conver os str to str"),
-        }
+        let num = p
+            .file_name()
+            .and_then(|os_str| os_str.to_str())
+            .and_then(|str| str.parse::<u32>().ok())
+            .expect("ERROR : need file to be number");
 
         num
     });
