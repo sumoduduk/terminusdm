@@ -137,20 +137,25 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
         app.update_stage(key, DownloadStage::DOWNLOADING);
         let _ = app.save_history();
-        let res = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await;
+        let res = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await?;
 
-        if let Ok(res) = res {
-            let list_uncomplete = check(&res, &ranges);
+        let mut list_incomplete = check(&res, &ranges);
 
-            let _ =
-                start_download(temp.clone(), &real_url, &list_uncomplete, number_concurrent).await;
+        while !list_incomplete.is_empty() {
+            let new_res =
+                start_download(temp.clone(), &real_url, &list_incomplete, number_concurrent)
+                    .await?;
 
-            app.update_stage(key, DownloadStage::MERGING);
-            let _ = app.save_history();
-            merge(&temp, ranges.len(), &download_path, &file_name).await?;
-            app.update_stage(key, DownloadStage::COMPLETE);
-            let _ = app.save_history();
+            list_incomplete = check(&new_res, &ranges);
         }
+
+        app.update_stage(key, DownloadStage::MERGING);
+        let _ = app.save_history();
+
+        merge(&temp, ranges.len(), &download_path, &file_name).await?;
+
+        app.update_stage(key, DownloadStage::COMPLETE);
+        let _ = app.save_history();
     }
     Ok(())
 }
