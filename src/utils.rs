@@ -14,7 +14,7 @@ pub fn create_range(num: u64, divisor: u64) -> Option<Vec<(u64, u64)>> {
     for i in 0..divisor {
         let mut end = (start + range_size) - 1;
         if i == divisor - 1 {
-            end = num
+            end = num - 1
         }
         ranges.push((start, end));
         start = end + 1;
@@ -31,7 +31,7 @@ mod tests {
     fn test_create_range_normal() {
         assert_eq!(
             create_range(25, 4),
-            Some(vec![(0, 5), (6, 11), (12, 17), (18, 25),])
+            Some(vec![(0, 5), (6, 11), (12, 17), (18, 24),])
         );
     }
 
@@ -49,7 +49,7 @@ mod tests {
                 (60, 69),
                 (70, 79),
                 (80, 89),
-                (90, 100),
+                (90, 99),
             ])
         );
     }
@@ -65,7 +65,7 @@ mod tests {
                 (21, 27),
                 (28, 34),
                 (35, 41),
-                (42, 50),
+                (42, 49),
             ])
         );
     }
@@ -74,7 +74,7 @@ mod tests {
     fn test_create_range_normal_3() {
         assert_eq!(
             create_range(30, 5),
-            Some(vec![(0, 5), (6, 11), (12, 17), (18, 23), (24, 30)])
+            Some(vec![(0, 5), (6, 11), (12, 17), (18, 23), (24, 29)])
         );
     }
     #[test]
@@ -89,7 +89,7 @@ mod tests {
                 (500, 624),
                 (625, 749),
                 (750, 874),
-                (875, 1000)
+                (875, 999)
             ])
         );
     }
@@ -106,7 +106,7 @@ mod tests {
                 (748, 934),
                 (935, 1121),
                 (1122, 1308),
-                (1309, 1500)
+                (1309, 1499)
             ])
         );
     }
@@ -123,7 +123,7 @@ mod tests {
                 (1000, 1249),
                 (1250, 1499),
                 (1500, 1749),
-                (1750, 2000)
+                (1750, 1999)
             ])
         );
     }
@@ -140,16 +140,9 @@ mod tests {
                 (12324, 15404),
                 (15405, 18485),
                 (18486, 21566),
-                (21567, 24651)
+                (21567, 24650)
             ])
         );
-    }
-
-    #[test]
-    fn test_range_big() {
-        let res = create_range(171605752, 16);
-        dbg!(res);
-        assert_eq!(true, false)
     }
 }
 
