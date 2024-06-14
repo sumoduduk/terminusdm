@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use trauma::download::{Download, Summary};
 use trauma::downloader::DownloaderBuilder;
 
+use crate::FilePartSizeList;
+
 pub async fn start_download(
     temp: PathBuf,
     uri: &Url,
@@ -17,6 +19,29 @@ pub async fn start_download(
 
     for (i, range) in range_header.iter().enumerate() {
         let dl = Download::new(uri, &i.to_string(), Some(*range));
+        batch_dl.push(dl);
+    }
+
+    let begin = DownloaderBuilder::new()
+        .directory(temp)
+        .concurrent_downloads(num_concur)
+        .build();
+
+    let summary = begin.download(&batch_dl).await;
+
+    Ok(summary)
+}
+
+pub async fn re_download(
+    temp: PathBuf,
+    uri: &Url,
+    filepart_size: &FilePartSizeList,
+    num_concur: usize,
+) -> eyre::Result<Vec<Summary>> {
+    let mut batch_dl = Vec::with_capacity(filepart_size.len());
+
+    for (name, range) in filepart_size.iter() {
+        let dl = Download::new(uri, name, Some(*range));
         batch_dl.push(dl);
     }
 
