@@ -8,6 +8,7 @@ mod utils;
 mod validate_merge;
 mod words;
 
+use begin_download::re_download;
 use eyre::OptionExt;
 use req_lib::HeaderObject;
 use reqwest::Url;
@@ -23,6 +24,9 @@ use crate::{
     merge_file::merge,
     utils::create_range,
 };
+
+type RangeDownload = (u64, u64);
+type FilePartSizeList = Vec<(String, RangeDownload)>;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum DownloadStage {
@@ -143,8 +147,8 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
         let mut list_incomplete = check(&ranges, &temp, ranges.len()).await?;
 
         while !list_incomplete.is_empty() {
-            let _ = start_download(temp.clone(), &real_url, &list_incomplete, number_concurrent)
-                .await?;
+            let _ =
+                re_download(temp.clone(), &real_url, &list_incomplete, number_concurrent).await?;
 
             list_incomplete = check(&ranges, &temp, ranges.len()).await?;
         }
