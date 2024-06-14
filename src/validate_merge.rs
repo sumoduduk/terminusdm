@@ -1,32 +1,29 @@
-use crate::begin_download::trauma::download::Summary;
+use std::path::Path;
 
-pub fn check(list_summary: &[Summary], range_headers: &[(u64, u64)]) -> Vec<(u64, u64)> {
-    let vec_opt = list_summary
-        .iter()
-        .filter_map(|summary| {
-            let filename = &summary.download().filename;
+use crate::sort_files::sorting;
 
-            let summary_size = summary.size();
+pub async fn check(
+    range_headers: &[(u64, u64)],
+    path_parent: &Path,
+    divisor: usize,
+) -> eyre::Result<Vec<(u64, u64)>> {
+    let files = sorting(path_parent, divisor).await?;
 
-            let mut uncomplete_file = None;
+    let check_files = files.iter().zip(range_headers);
 
-            let num_filename = filename
-                .parse::<usize>()
-                .expect("ERROR : need filename to be number");
+    let mut incomplete_files: Vec<(u64, u64)> = Vec::with_capacity(range_headers.len());
 
-            for (i, range) in range_headers.into_iter().enumerate() {
-                if i == num_filename {
-                    let target_size = range.1 - range.0;
+    for file_check in check_files {
+        let target = file_check.1;
+        let file = file_check.0;
 
-                    if summary_size != target_size {
-                        uncomplete_file = Some((range.0, range.1))
-                    }
-                }
-            }
+        let target_size = (target.1 - target.0) + 1;
+        let file_size = file.metadata()?.len();
 
-            uncomplete_file
-        })
-        .collect::<Vec<(u64, u64)>>();
+        if target_size != file_size {
+            incomplete_files.push(*target);
+        }
+    }
 
-    vec_opt
+    Ok(incomplete_files)
 }
