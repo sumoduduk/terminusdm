@@ -2,6 +2,7 @@ mod begin_download;
 pub mod config;
 mod merge_file;
 mod req_lib;
+mod sort_files;
 pub mod tui;
 mod utils;
 mod validate_merge;
@@ -137,16 +138,15 @@ pub async fn download_chunk(app: &mut AppTui, key: u32) -> eyre::Result<()> {
 
         app.update_stage(key, DownloadStage::DOWNLOADING);
         let _ = app.save_history();
-        let res = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await?;
+        let _ = start_download(temp.clone(), &real_url, &ranges, number_concurrent).await?;
 
-        let mut list_incomplete = check(&res, &ranges);
+        let mut list_incomplete = check(&ranges, &temp, ranges.len()).await?;
 
         while !list_incomplete.is_empty() {
-            let new_res =
-                start_download(temp.clone(), &real_url, &list_incomplete, number_concurrent)
-                    .await?;
+            let _ = start_download(temp.clone(), &real_url, &list_incomplete, number_concurrent)
+                .await?;
 
-            list_incomplete = check(&new_res, &ranges);
+            list_incomplete = check(&ranges, &temp, ranges.len()).await?;
         }
 
         app.update_stage(key, DownloadStage::MERGING);
