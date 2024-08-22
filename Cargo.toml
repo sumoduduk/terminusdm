@@ -1,6 +1,6 @@
 [package]
 name = "terminusdm"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 license = "GPL-3.0-or-later"
 include = [
@@ -38,20 +38,20 @@ dirs = "5.0.1"
 futures = "0.3.25"
 indicatif = "0.17.3"
 eyre = "0.6.12"
-reqwest = { version = "0.11.24", features = ["stream", "socks"] }
-reqwest-middleware = "0.2.4"
-reqwest-retry = "0.3.0"
+reqwest = { version = "0.12.7", features = ["stream", "socks"] }
+reqwest-middleware = "0.3.3"
+reqwest-retry = "0.6.1"
 tokio = { version = "1.36.0", features = ["full"] }
 form_urlencoded = "1.2.1"
-crossterm = "0.27.0"
-ratatui = { version = "0.26.1", features = ["all-widgets"]}
+crossterm = { version = "0.28.1", features = ["event-stream"] }
+ratatui = { version = "0.28.0", features = ["all-widgets"]}
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.114"
-tui-input = "0.8.0"
+tui-input = "0.10.0"
 ron = "0.8.1"
 indexmap = { version ="2.2.6", features = ["serde"] }
 strum = { version = "0.26.2", features = ["derive"] }
-throbber-widgets-tui = "0.5.0"
+throbber-widgets-tui = "0.7.0"
 thiserror = "1.0.38"
 
 
