@@ -121,13 +121,10 @@ impl AppTui {
         let indexes = &self.table.picked;
         indexes.iter().for_each(|idx| {
             let hist = self.history.get_history_by_idx(*idx);
-            match hist {
-                Ok((num, hist)) => {
-                    let url = hist.url();
+            if let Ok((num, hist)) = hist {
+                let url = hist.url();
 
-                    self.saved_input.push((*num, url.to_string()))
-                }
-                Err(_) => (),
+                self.saved_input.push((*num, url.to_string()))
             }
         });
 
