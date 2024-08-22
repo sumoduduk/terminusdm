@@ -4,6 +4,7 @@ mod merge_file;
 mod req_lib;
 mod sort_files;
 pub mod tui;
+mod user_interface;
 mod utils;
 mod validate_merge;
 mod words;
